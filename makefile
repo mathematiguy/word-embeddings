@@ -6,6 +6,10 @@ UID ?= $(shell id -u)
 GID ?= $(shell id -g)
 DOCKER_ARGS ?= 
 GIT_TAG ?= $(shell git log --oneline | head -n1 | awk '{print $$1}')
+LOG_LEVEL ?= INFO
+
+crawl:
+	$(RUN) scrapy crawl papers -o data/output.json -a old_output=data/old_output.json -L $(LOG_LEVEL)
 
 JUPYTER_PASSWORD ?= jupyter
 JUPYTER_PORT ?= 8888
@@ -21,6 +25,13 @@ jupyter:
 		--NotebookApp.password=$(shell $(RUN) \
 			python3 -c \
 			"from IPython.lib import passwd; print(passwd('$(JUPYTER_PASSWORD)'))")
+
+ipython: DOCKER_ARGS=-it
+ipython:
+	$(RUN) ipython --no-autoindent
+
+clean:
+	rm -rf data/*
 
 .PHONY: docker
 docker:

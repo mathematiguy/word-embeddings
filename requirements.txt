@@ -1,10 +1,12 @@
 numpy
 scipy
 matplotlib
-librosa==0.6.0
-tensorflow
-tensorboardX
-inflect==0.2.5
-Unidecode==1.0.22
 pillow
 jupyter
+scrapy
+pandas
+nltk
+prefect
+fasttext
+jupyterlab
+scikit-learn
