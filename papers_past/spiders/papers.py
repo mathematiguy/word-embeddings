@@ -12,23 +12,32 @@ def load_old_output(path):
         output_json = json.load(f)
         return {j['url']: j['text'] for j in output_json}
 
+
+def get_start_urls(path):
+    with open(path, 'r') as f:
+        start_urls = json.load(f)['newspapers']
+        return [
+            start_urls['url'] + name for name in start_urls['names']
+        ]
+
+
 class PapersSpider(scrapy.Spider):
     name = 'papers'
     allowed_domains = ['paperspast.natlib.govt.nz']
     start_urls = ['http://paperspast.natlib.govt.nz/newspapers/all/']
 
-    def __init__(self, old_output, *args, **kwargs):
+    def __init__(self, old_output, start_urls,  *args, **kwargs):
         super(scrapy.Spider, self).__init__(*args, **kwargs)
         self.old_output = load_old_output(old_output)
+        self.start_urls = get_start_urls(start_urls)
+
+    # def parse(self, response):
+    #     newspaper_paths = response.xpath("//td/a/@href").extract()
+    #     for path in newspaper_paths:
+    #         newspaper_url = response.urljoin(path)
+    #         yield scrapy.Request(newspaper_url, callback = self.parse_newspaper)
 
     def parse(self, response):
-
-        newspaper_paths = response.xpath("//td/a/@href").extract()
-        for path in newspaper_paths:
-            newspaper_url = response.urljoin(path)
-            yield scrapy.Request(newspaper_url, callback = self.parse_newspaper)
-
-    def parse_newspaper(self, response):
 
         # Jump to the next page if it exists
         next_button = (response
@@ -37,8 +46,7 @@ class PapersSpider(scrapy.Spider):
         if len(next_button) == 1:
             next_button = next_button.extract_first()
             next_newspaper_url = response.urljoin(next_button)
-            yield scrapy.Request(next_newspaper_url, callback = self.parse_newspaper)
-
+            yield scrapy.Request(next_newspaper_url, callback = self.parse)
 
         issue_paths = response.xpath('//td/a/@href').extract()
         for path in issue_paths:

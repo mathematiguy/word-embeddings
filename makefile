@@ -9,7 +9,7 @@ GIT_TAG ?= $(shell git log --oneline | head -n1 | awk '{print $$1}')
 LOG_LEVEL ?= INFO
 
 crawl:
-	$(RUN) scrapy crawl papers -o data/output.json -a old_output=data/old_output.json -L $(LOG_LEVEL)
+	$(RUN) scrapy crawl papers -o data/output.json -a old_output=data/old_output.json -a start_urls=start_urls.json -L $(LOG_LEVEL)
 
 JUPYTER_PASSWORD ?= jupyter
 JUPYTER_PORT ?= 8888

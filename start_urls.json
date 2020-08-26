@@ -1,0 +1,44 @@
+{
+	"newspapers": {
+		"url": "https://paperspast.natlib.govt.nz/newspapers/",
+		"names": [
+			"anglo-maori-warder",
+			"aotearoa-he-nupepa-ma-nga-tangata-maori",
+			"haeata",
+			"hiiringa-i-te-whitu",
+			"hokioi-o-nui-tireni-e-rere-atuna",
+			"huia-tangata-kotahi",
+			"jubilee-te-tiupiri",
+			"kahiti-tuturu-mo-aotearoa-me-te-waipounamu",
+			"karere-o-poneke",
+			"korimako",
+			"maori-messenger-te-karere-maori",
+			"mareikura",
+			"matariki",
+			"matuhi",
+			"paki-o-matariki",
+			"pihoihoi-mokemoke-i-runga-i-te-tuanui",
+			"puke-ki-hikurangi",
+			"takitimu",
+			"waka-maori",
+			"wananga",
+			"whetu-o-te-tau"
+		]
+	},
+	"journals": {
+		"url": "https://paperspast.natlib.govt.nz/periodicals/",
+		"names": [
+			"aotearoa-or-the-maori-recorder",
+			"hoa-maori",
+			"kaea",
+			"kopara",
+			"maori-record-a-journal-devoted-to-the-advancement-of-the-maori-people",
+			"muka",
+			"pipiwharauroa",
+			"reo-ote-hokowhitu-a-tu",
+			"te-ao-hou",
+			"toa-takitini",
+			"tu-tangata"
+		]
+	}
+}
