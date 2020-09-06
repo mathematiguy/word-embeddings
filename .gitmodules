@@ -1,0 +1,3 @@
+[submodule "reo-toolkit"]
+	path = reo-toolkit
+	url = git@github.com:TeHikuMedia/reo-toolkit.git
