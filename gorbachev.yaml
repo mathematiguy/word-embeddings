@@ -1,1 +1,2 @@
-docker: docker.dragonfly.co.nz/minimal-project
+docker: redis:4
+publish: papers-past
