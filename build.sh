@@ -2,4 +2,4 @@
 
 set -ex
 
-cp D3/* /publish
+cp -r D3/* /publish
