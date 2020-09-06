@@ -1,12 +1,16 @@
 DOCKER_REGISTRY := docker.dragonfly.co.nz
 IMAGE_NAME := $(shell basename `git rev-parse --show-toplevel` | tr '[:upper:]' '[:lower:]')
 IMAGE := $(DOCKER_REGISTRY)/$(IMAGE_NAME)
-RUN ?= docker run $(DOCKER_ARGS) --rm -v $$(pwd):/work -w /work -u $(UID):$(GID) $(IMAGE)
+RUN ?= docker run $(DOCKER_ARGS) --rm -v $$(pwd):/code -w /code -u $(UID):$(GID) $(IMAGE)
 UID ?= $(shell id -u)
 GID ?= $(shell id -g)
 DOCKER_ARGS ?= 
 GIT_TAG ?= $(shell git log --oneline | head -n1 | awk '{print $$1}')
 LOG_LEVEL ?= INFO
+
+web_server: PORT=-p 8000:8000
+web_server:
+	(cd D3 && $(RUN_IMAGE) python3 -m http.server)
 
 crawl:
 	$(RUN) scrapy crawl papers -o data/output.json -a old_output=data/old_output.json -a start_urls=start_urls.json -L $(LOG_LEVEL)
@@ -31,7 +35,7 @@ ipython:
 	$(RUN) ipython --no-autoindent
 
 clean:
-	rm -rf data/*
+	rm -rf data/output.json data/old_output.json
 
 .PHONY: docker
 docker:
