@@ -1,0 +1,223 @@
+---
+title: "Network augmentation of word embeddings: Application to the Nupepa Māori archive"
+subtitle: "`r format(Sys.time(), '%d %B, %Y')`"
+author: "Caleb Moses"
+documentclass: dragonfly-proposal
+clean: False
+header-includes:
+  - \usepackage{draftwatermark}
+output:
+  bookdown::pdf_document2:
+    toc: false
+    latex_engine: xelatex
+    fig_width: 5
+    fig_height: 3
+    fig_caption: true
+    template: /code/analysis/template.tex
+    keep_tex: true
+---
+
+```{r import-libraries, message = FALSE, echo = FALSE}
+
+# Import libraries
+library(tidyverse)
+library(fastrtext)
+library(ggnetwork)
+library(igraph)
+library(rjson)
+library(furrr)
+library(here)
+
+# Use furr multiprocessing
+plan(multiprocess)
+
+# Set default ggplot theme
+theme_set(theme_minimal() + theme(plot.title = element_text(hjust = 0.5)))
+
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center", warning = FALSE, message = FALSE)
+
+```
+
+
+# Load the data
+
+Here is some text
+
+```{r load-data}
+
+model = fastrtext::load_model(here('data/fasttext.bin'))
+model_data <- read_csv(here('data/model_data.csv'))
+model_data
+
+```
+
+```{r get-similarity-hist, fig.width=5, fig.height=3}
+
+word_vectors <- get_word_vectors(model, words = model_data$word) %>%
+    apply(1, function(x) {x / sqrt(sum(x^2))})
+
+similarity <- t(word_vectors) %*% word_vectors %>%
+    as_tibble() %>%
+    gather(key = 'word1', value = 'score') %>%
+    mutate(word2 = rep(model_data$word, nrow(model_data))) %>%
+    select(word1, word2, score) %>%
+    filter(word1 < word2)
+
+similarity %>%
+    ggplot(aes(x = score)) +
+    geom_histogram(binwidth = 0.02)
+
+```
+
+# Create the word graph
+
+```{r create-graph, fig.height=5}
+
+threshold = 0.55 # quantile(score, probs = prob)
+
+edges <- similarity %>%
+    filter(score >= threshold)
+
+vertices <- similarity %>%
+    filter(score >= threshold) %>%
+    select(-score) %>%
+    gather(key = 'key', value = 'word') %>%
+    select(-key) %>%
+    distinct()
+
+G <- graph.data.frame(edges,
+        directed=FALSE,
+        vertices = vertices)
+
+# Visualise the graph
+G %>%
+    ggnetwork() %>%
+    ggplot(aes(x = x, y = y, xend = xend, yend = yend)) +
+    geom_edges(alpha = 0.01) +
+    geom_nodes(aes(size = log10(score)), colour = '#69010D', alpha = 0.1) +
+    guides(size = FALSE) +
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          axis.title.y=element_blank(),
+          axis.text.y=element_blank(),
+          axis.ticks.y=element_blank(),
+          panel.grid.major = element_blank())
+
+```
+
+## Shortest paths
+
+```{r shortest-paths}
+
+shortest_paths(G, 'whakaminenga', 'mohi_tawhai')
+
+```
+
+## Longest path
+
+```{r longest-paths}
+
+diameter(G)
+
+farthest_vertices(G)
+
+shortest_paths(G, 'iho', 'kuhu')
+
+```
+
+## All shortest paths
+
+```{r}
+
+iho_to_kuhu <- all_shortest_paths(G, 'iho', 'kuhu')$res
+
+m <- iho_to_kuhu %>%
+    map(names) %>%
+    bind_cols() %>%
+    t() %>%
+    as.matrix()
+
+m <- paste(m[,1:9], m[,2:10])
+dim(m) <- NULL
+
+longest_path_edges <- tibble(edge = m) %>%
+    separate(edge, into = c('from', 'to')) %>%
+    group_by(from, to) %>%
+    count(name = 'weight')
+
+longest_path_vertices = unique(c(longest_path_edges$from, longest_path_edges$to))
+
+longest_paths <- graph.data.frame(longest_path_edges, directed = FALSE, vertices = longest_path_vertices)
+
+plot(longest_paths)
+
+```
+
+## PageRank
+
+```{r page-rank, fig.height = 6}
+
+ranked <- page_rank(G)
+
+tibble(
+    word = names(ranked$vector),
+    rank_score = ranked$vector) %>%
+    arrange(desc(rank_score)) %>%
+    head(30) %>%
+    ggplot(aes(x = reorder(word, rank_score), y = rank_score, label = word)) +
+    geom_bar(stat = 'identity') +
+    coord_flip() +
+    xlab("Rank score") +
+    ylab("word")
+
+```
+
+## Community detection
+
+```{r graph-clustering}
+
+clusters <- cluster_walktrap(G)
+
+cluster_data <- tibble(
+    name = clusters$names,
+    membership = clusters$membership
+)
+
+cluster_data %>%
+    group_by(membership) %>%
+    count() %>%
+    ggplot(aes(x = factor(membership), y = n+1)) +
+    geom_bar(stat = 'identity') +
+    scale_y_log10()
+
+```
+
+```{r, fig.height = 10}
+
+reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
+    new_x <- paste(x, within, sep = sep)
+    stats::reorder(new_x, by, FUN = fun)
+}
+
+scale_x_reordered <- function(..., sep = "___") {
+    reg <- paste0(sep, ".+$")
+    ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
+}
+
+cluster_data %>%
+    rename(word = name) %>%
+    left_join(model_data) %>%
+    arrange(membership, desc(count)) %>%
+    group_by(membership) %>%
+    mutate(membership_freq = n()) %>%
+    filter(membership_freq > 5) %>%
+    do(head(., 10)) %>%
+    ggplot(aes(x = reorder_within(word, count, membership), y = count, fill = factor(membership))) +
+    geom_bar(stat = 'identity') +
+    facet_wrap(~membership, scales = 'free', ncol = 4) +
+    scale_x_reordered() +
+    guides(fill = FALSE) +
+    coord_flip()
+
+```
