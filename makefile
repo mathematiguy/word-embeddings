@@ -27,6 +27,9 @@ notebooks: $(shell ls -d analysis/*.Rmd | sed 's/.Rmd/.pdf/g')
 analysis/%.pdf: analysis/%.Rmd
 	$(RUN) Rscript -e 'rmarkdown::render("$<")'
 
+data/papers.csv: scripts/create_papers.py
+	$(RUN) python3 $< --papers_json data/newspapers.json --papers_csv $@ --log_level $(LOG_LEVEL)
+
 shiny: DOCKER_ARGS= -p 7727:7727
 shiny:
 	$(RUN) Rscript shiny/global.R

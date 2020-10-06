@@ -1,0 +1,3 @@
+docker: mathematiguy/papers-past:f400635
+depends:
+  - papers-past-crawler

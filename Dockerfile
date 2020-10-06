@@ -21,4 +21,3 @@ RUN Rscript -e 'install.packages("igraph")'
 RUN Rscript -e 'install.packages("bookdown")'
 RUN Rscript -e 'devtools::install_github("pommedeterresautee/fastrtext")'
 RUN Rscript -e 'install.packages("ggnetwork")'
-
