@@ -1,0 +1,76 @@
+\documentclass[$if(draft)$draft$endif$]{$documentclass$}
+
+$if(title)$
+\title{$if(shorttitle)$$shorttitle$$else$$title$$endif$}{$title$}
+$endif$
+
+$if(subtitle)$
+\subtitle{$subtitle$}
+$endif$
+
+%Normally the inside cover citation uses the subtitle text at the end of the 
+%citation. However this can be overriden using \citationnote
+%\citationnote{A cool alternative}
+$if(citationnote)$
+\citationnote{$citationnote$}
+$endif$
+
+
+% Authors must be included for a report. They should be listed with their full names
+% with each author separated by \and.
+% \author{John Smith \and Jane E. Smith \and Jack Smith}
+$if(author)$
+\author{$author$}
+$endif$
+
+%\usepackage{draftwatermark}
+\usepackage{pdflscape}
+\usepackage{amsmath}
+\usepackage{subcaption,longtable,float}
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
+
+
+$if(titleimage)$
+\titleimage{$titleimage$}
+\singleimage{$titleimagelicence$}{$titleimageurl$}
+$endif$
+
+% Dragonfly reports all have a licence attached. The default dragonfly licence can
+% be used with \bydragonfly. The crown licence can be used with \bycrown. 
+% You can also directly enter whichever licence is appropriate. 
+%\licence{\bydragonfly}
+
+$if(licence)$
+\licence{$licence$}
+$endif$
+
+$if(bibliography)$
+\defbibheading{bibliography}[References]{\section{#1}}
+\addbibresource{$bibliography$}
+$endif$
+\addbibresource{$selfcitation$}
+
+% The actual document contents begin after here. 
+\begin{document}
+
+
+% Generates the title page
+\maketitle
+
+% Generates the table of contents
+$if(toc)$
+\tableofcontents
+$endif$
+
+$body$
+
+$for(include-after)$
+$include-after$
+$endfor$
+\label{LastPage}
+\end{document}
