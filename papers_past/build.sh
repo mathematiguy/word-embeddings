@@ -1,9 +1,8 @@
 #/bin/bash
-
 set -ex
 
-cd ..
+export RUN=
 
-make crawl
+cd .. && make crawl
 
 mv data/newspapers.json /output
