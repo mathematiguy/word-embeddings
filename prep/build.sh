@@ -8,6 +8,9 @@ cd ..
 
 make ${DATA_DIR}/model_data.csv
 
+# Show file sizes for output
+du -sh ${DATA_DIR}
+
 mv ${DATA_DIR}/papers.csv \
    ${DATA_DIR}/papers_corpus.txt \
    ${DATA_DIR}/model_data.csv \
