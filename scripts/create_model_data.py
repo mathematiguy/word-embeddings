@@ -14,8 +14,9 @@ def build_model_data(model):
 
 @click.command()
 @click.option('--model_file', help='Path to save the fasttext model')
+@click.option('--model_data_path', help='Path to save model_data.csv')
 @click.option('--log_level', default='INFO', help='Log level (default: INFO)')
-def main(model_file, log_level):
+def main(model_file, model_data_path, log_level):
 
     global logger
     logger = initialise_logger(log_level)
@@ -23,7 +24,7 @@ def main(model_file, log_level):
     model = fasttext.load_model(model_file)
     model_data = build_model_data(model)
 
-    print(model_data)
+    model_data.to_csv(model_data_path)
 
 
 if __name__ == '__main__':
