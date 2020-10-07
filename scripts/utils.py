@@ -1,6 +1,14 @@
+import logging
 from tqdm import tqdm
 from multiprocessing import cpu_count
 from concurrent.futures import ProcessPoolExecutor, as_completed
+
+
+def initialise_logger(log_level):
+    logger = logging.getLogger(__name__)
+    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(level=log_level, format=log_fmt)
+    return logger
 
 
 def multicore_apply(array, func, n_jobs=cpu_count()-1, use_kwargs=False, front_num=0):

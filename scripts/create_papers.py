@@ -116,6 +116,8 @@ def create_papers(papers):
         phrase_length = 5
     )
 
+    papers = papers.loc[~papers.phrase.isna(), :]
+
     return papers
 
 

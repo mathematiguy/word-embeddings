@@ -2,11 +2,14 @@
 set -ex
 
 export RUN=
+export DATA_DIR=/input/papers-past-crawler
 
 cd ..
 
-mv /input/newspapers.json data
+make model_data.csv
 
-make data/papers.csv
-
-mv data/papers.csv /output
+mv ${DATA_DIR}/papers.csv \
+   ${DATA_DIR}/papers_corpus.txt \
+   ${DATA_DIR}/fasttext.bin \
+   ${DATA_DIR}/model_data.csv \
+   /output
