@@ -6,7 +6,7 @@ export DATA_DIR=/input/papers-past-crawler
 
 cd ..
 
-make model_data.csv
+make ${DATA_DIR}/model_data.csv
 
 mv ${DATA_DIR}/papers.csv \
    ${DATA_DIR}/papers_corpus.txt \
