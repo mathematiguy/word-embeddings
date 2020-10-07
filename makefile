@@ -38,10 +38,10 @@ $(DATA_DIR)/papers_corpus.txt: scripts/create_corpus.py $(DATA_DIR)/papers.csv
 		--log_level $(LOG_LEVEL)
 
 $(DATA_DIR)/fasttext.bin: scripts/create_model.py $(DATA_DIR)/papers_corpus.txt
-	$(RUN) python3 $< --corpus_file $(DATA_DIR)/papers_corpus.txt --model_file $@
+	$(RUN) python3 $< --corpus_file $(DATA_DIR)/papers_corpus.txt --model_file $@ --log_level $(LOG_LEVEL)
 
 $(DATA_DIR)/model_data.csv: scripts/create_model_data.py $(DATA_DIR)/fasttext.bin
-	$(RUN) python3 $< --model_file $(DATA_DIR)/fasttext.bin
+	$(RUN) python3 $< --model_file $(DATA_DIR)/fasttext.bin --model_data_path $@ --log_level $(LOG_LEVEL)
 
 shiny: DOCKER_ARGS= -p 7727:7727
 shiny:
