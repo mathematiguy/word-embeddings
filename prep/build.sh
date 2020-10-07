@@ -5,9 +5,7 @@ export RUN=
 
 cd ..
 
-ls /input
-
-mv /input/newspapers.json data
+mv /input/papers-past-crawler/newspapers.json data
 
 make data/papers.csv
 
