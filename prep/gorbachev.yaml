@@ -1,3 +1,5 @@
 docker: mathematiguy/papers-past:f400635
 requires:
   - papers-past-crawler
+cpus: 4
+memory: 8
