@@ -36,7 +36,7 @@ notebooks: $(shell ls -d analysis/*.Rmd | sed 's/.Rmd/.pdf/g')
 analysis/%.pdf: analysis/%.Rmd
 	$(RUN) Rscript -e 'rmarkdown::render("$<")'
 
-$(PAPERS_DIR)/papers.csv: scripts/create_papers.py
+$(PAPERS_DIR)/papers.csv: scripts/create_papers.py $(PAPERS_DIR)/papers.json
 	$(RUN) python3 $< \
 		--papers_json $(PAPERS_DIR)/papers.json \
 		--papers_csv $@ \
