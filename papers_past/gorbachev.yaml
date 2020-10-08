@@ -1,3 +1,5 @@
 docker: mathematiguy/papers-past:1ee460f
 allows:
-  - papers-past-prep
+  - papers-past-embeddings
+triggers:
+  - papers-past-embeddings
