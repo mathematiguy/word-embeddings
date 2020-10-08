@@ -26,9 +26,9 @@ web_server:
 crawl: $(PAPERS_DIR)/papers.json
 $(PAPERS_DIR)/papers.json:
 	$(RUN) bash -c "cd papers_past && scrapy crawl papers \
-		-o ../$(PAPERS_DIR)/papers.json \
-		-a old_output=../$(PAPERS_DIR)/papers.json \
-		-a start_urls=../start_urls.json \
+		-o $(PAPERS_DIR)/papers.json \
+		-a old_output=$(PAPERS_DIR)/papers.json \
+		-a start_urls=start_urls.json \
 		-L $(LOG_LEVEL)"
 
 notebooks: $(shell ls -d analysis/*.Rmd | sed 's/.Rmd/.pdf/g')
