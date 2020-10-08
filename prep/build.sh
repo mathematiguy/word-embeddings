@@ -2,19 +2,21 @@
 set -ex
 
 export RUN=
+export MIN_COUNT=30
+export AUTOTUNE_DURATION=1800
 
 cd ..
 
-cp /input/papers-past-crawler data/papers
+cp /input/papers-past-crawler/papers.json data/papers
 
 make all
 
 # Show file sizes for output
-du -sh ${DATA_DIR}/*
+du -sh data/papers/*
 
-mv ${DATA_DIR}/corpus.txt ${DATA_DIR}/corpus.train \
-   ${DATA_DIR}/corpus.test ${DATA_DIR}/word_counts.txt \
+mv data/papers/corpus.txt data/papers/corpus.train \
+   data/papers/corpus.test data/papers/word_counts.txt \
    /output
 
-zip /output/papers.zip ${DATA_DIR}/papers.csv
-zip /output/fasttext.zip ${DATA_DIR}/fasttext_cbow.bin ${DATA_DIR}/fasttext_cbow.vec
+zip /output/papers.zip data/papers/papers.csv
+zip /output/fasttext.zip data/papers/fasttext_cbow.bin data/papers/fasttext_cbow.vec
