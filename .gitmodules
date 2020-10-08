@@ -1,3 +1,6 @@
 [submodule "reo-toolkit"]
-	path = reo-toolkit
+	path = submodules/reo-toolkit
 	url = git@github.com:TeHikuMedia/reo-toolkit.git
+[submodule "submodules/fastText"]
+	path = submodules/fastText
+	url = https://github.com/facebookresearch/fastText.git

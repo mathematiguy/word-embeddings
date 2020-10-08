@@ -7,20 +7,27 @@ GID ?= $(shell id -g)
 DOCKER_ARGS ?=
 GIT_TAG ?= $(shell git log --oneline | head -n1 | awk '{print $$1}')
 LOG_LEVEL ?= INFO
-
+NUM_CORES ?= $(shell expr `grep -Pc '^processor\t' /proc/cpuinfo` - 1)
 DATA_DIR ?= data
+PAPERS_DIR ?= data/papers
+
+# Parameters
+MIN_COUNT ?= 30  # Minimum number of occurrences to keep a word in the corpus
 
 .PHONY: web_server crawl notebooks shiny r_session jupyter ipython clean docker \
 	docker-push docker-pull enter enter-root
 
+all: $(PAPERS_DIR)/fasttext_cbow.bin $(PAPERS_DIR)/word_counts.txt
+
 web_server: PORT=-p 8000:8000
 web_server:
-	(cd D3 && $(RUN_IMAGE) python3 -m http.server)
+	(cd wordmap && $(RUN_IMAGE) python3 -m http.server)
 
-crawl:
+crawl: $(PAPERS_DIR)/papers.json
+$(PAPERS_DIR)/papers.json:
 	$(RUN) bash -c "cd papers_past && scrapy crawl papers \
-		-o ../$(DATA_DIR)/newspapers.json \
-		-a old_output=../$(DATA_DIR)/newspapers.json \
+		-o ../$(PAPERS_DIR)/papers.json \
+		-a old_output=../$(PAPERS_DIR)/papers.json \
 		-a start_urls=../start_urls.json \
 		-L $(LOG_LEVEL)"
 
@@ -29,19 +36,35 @@ notebooks: $(shell ls -d analysis/*.Rmd | sed 's/.Rmd/.pdf/g')
 analysis/%.pdf: analysis/%.Rmd
 	$(RUN) Rscript -e 'rmarkdown::render("$<")'
 
-$(DATA_DIR)/papers.csv: scripts/create_papers.py
-	$(RUN) python3 $< --papers_json $(DATA_DIR)/newspapers.json --papers_csv $@ --log_level $(LOG_LEVEL)
-
-$(DATA_DIR)/papers_corpus.txt: scripts/create_corpus.py $(DATA_DIR)/papers.csv
-	$(RUN) python3 $< --papers_csv $(DATA_DIR)/papers.csv \
-		--corpus_file $(DATA_DIR)/papers_corpus.txt \
+$(PAPERS_DIR)/papers.csv: scripts/create_papers.py
+	$(RUN) python3 $< \
+		--papers_json $(PAPERS_DIR)/papers.json \
+		--papers_csv $@ \
+		--min_count $(MIN_COUNT) \
 		--log_level $(LOG_LEVEL)
 
-$(DATA_DIR)/fasttext.bin: scripts/create_model.py $(DATA_DIR)/papers_corpus.txt
-	$(RUN) python3 $< --corpus_file $(DATA_DIR)/papers_corpus.txt --model_file $@
+$(PAPERS_DIR)/corpus.txt: scripts/create_corpus.py $(PAPERS_DIR)/papers.csv
+	$(RUN) python3 $< --papers_csv $(PAPERS_DIR)/papers.csv \
+		--corpus_file $(PAPERS_DIR)/papers_corpus.txt \
+		--log_level $(LOG_LEVEL)
 
-$(DATA_DIR)/model_data.csv: scripts/create_model_data.py $(DATA_DIR)/fasttext.bin
-	$(RUN) python3 $< --model_file $(DATA_DIR)/fasttext.bin
+$(PAPERS_DIR)/corpus.shuf: $(PAPERS_DIR)/corpus.txt
+	cat $< | shuf > $@
+
+$(PAPERS_DIR)/corpus.train: $(PAPERS_DIR)/corpus.shuf
+	head $< -n $(shell expr `wc -l $< | awk '{print $$1}'` \* 8 / 10) > $@
+
+$(PAPERS_DIR)/corpus.test: $(PAPERS_DIR)/corpus.shuf
+	tail $< -n +$(shell expr `wc -l $< | awk '{print $$1}'` \* 8 / 10 + 1) > $@
+
+AUTOTUNE_DURATION ?= 300
+$(PAPERS_DIR)/fasttext_cbow.bin: $(PAPERS_DIR)/corpus.train $(PAPERS_DIR)/corpus.test
+	$(RUN) fasttext cbow -input $< -output $(basename $@) -minCount $(MIN_COUNT) \
+		-thread $(NUM_CORES) -autotune-duration $(AUTOTUNE_DURATION) \
+		-autotune-validation $(PAPERS_DIR)/corpus.test
+
+$(PAPERS_DIR)/word_counts.txt: $(PAPERS_DIR)/corpus.txt
+	$(RUN) cat $< | grep -oE '[a-zāēīōū]+' | sort | uniq -c | sort -nr | awk '($$1 >= $(MIN_COUNT))' > $@
 
 shiny: DOCKER_ARGS= -p 7727:7727
 shiny:
@@ -70,7 +93,7 @@ ipython:
 	$(RUN) ipython --no-autoindent
 
 clean:
-	rm -rf $(DATA_DIR)/output.json $(DATA_DIR)/old_output.json
+	rm -rf data/papers/*
 
 docker:
 	docker build $(DOCKER_ARGS) --tag $(IMAGE):$(GIT_TAG) .

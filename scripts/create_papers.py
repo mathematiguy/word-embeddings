@@ -55,7 +55,7 @@ def phrase_model(lines, min_count, threshold, phrase_length):
 
     return lines
 
-def create_papers(papers):
+def create_papers(papers, min_count):
 
     col_patterns = {
         'newspaper_id': '([A-Z]+)[^/]+$',
@@ -100,7 +100,7 @@ def create_papers(papers):
               .apply(lambda x: ' '.join(
                    [y for y in x if y in non_maori_words]
               )),
-        min_count = 30,
+        min_count = min_count,
         threshold = 10,
         phrase_length = 5
     )
@@ -111,12 +111,12 @@ def create_papers(papers):
             .apply(lambda x: ' '.join(
                 [y for y in x if y in maori_words]
             ))),
-        min_count = 30,
+        min_count = min_count,
         threshold = 10,
         phrase_length = 5
     )
 
-    papers = papers.loc[~papers.phrase.isna(), :]
+    papers = papers.loc[~papers.phrase.isna(), [col for col in papers.columns if not col in ['words']]]
 
     return papers
 
@@ -124,14 +124,15 @@ def create_papers(papers):
 @click.command()
 @click.option('--papers_json', help='Path to newspapers.json')
 @click.option('--papers_csv', help='Path to papers.csv')
+@click.option('--min_count', type=int, help='Minimum count required to keep a word')
 @click.option('--log_level', default='INFO', help='Log level (default: INFO)')
-def main(papers_json, papers_csv, log_level):
+def main(papers_json, papers_csv, min_count, log_level):
 
     global logger
     logger = initialise_logger(log_level)
 
     papers = load_json(papers_json)
-    papers = create_papers(papers)
+    papers = create_papers(papers, min_count)
 
     papers.to_csv(papers_csv, index = False)
 

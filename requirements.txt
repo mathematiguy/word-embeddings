@@ -147,4 +147,5 @@ widgetsnbextension==3.5.1
 zict==2.0.0
 zipp==3.2.0
 zope.interface==5.1.1
--e /code/reo-toolkit/
+-e /code/submodules/reo-toolkit
+-e /code/submodules/fastText
