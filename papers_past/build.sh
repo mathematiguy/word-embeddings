@@ -5,4 +5,4 @@ export RUN=
 
 cd .. && make crawl
 
-mv data/papers.json /output
+mv data/papers/papers.json /output
