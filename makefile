@@ -36,14 +36,14 @@ notebooks: $(shell ls -d analysis/*.Rmd | sed 's/.Rmd/.pdf/g')
 analysis/%.pdf: analysis/%.Rmd
 	$(RUN) Rscript -e 'rmarkdown::render("$<")'
 
-$(PAPERS_DIR)/papers.csv: $(PAPERS_DIR)/scripts/create_papers.py $(PAPERS_DIR)/papers.json
+$(PAPERS_DIR)/papers.csv: papers/scripts/create_papers.py $(PAPERS_DIR)/papers.json
 	$(RUN) python3 $< \
 		--papers_json $(PAPERS_DIR)/papers.json \
 		--papers_csv $@ \
 		--min_count $(MIN_COUNT) \
 		--log_level $(LOG_LEVEL)
 
-$(PAPERS_DIR)/corpus.txt: $(PAPERS_DIR)/scripts/create_corpus.py $(PAPERS_DIR)/papers.csv
+$(PAPERS_DIR)/corpus.txt: papers/scripts/create_corpus.py $(PAPERS_DIR)/papers.csv
 	$(RUN) python3 $< --papers_csv $(PAPERS_DIR)/papers.csv \
 		--corpus_file $(PAPERS_DIR)/corpus.txt \
 		--log_level $(LOG_LEVEL)
