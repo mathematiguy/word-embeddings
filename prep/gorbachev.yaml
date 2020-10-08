@@ -1,4 +1,4 @@
-docker: mathematiguy/papers-past:079d987
+docker: mathematiguy/papers-past:1ee460f
 requires:
   - papers-past-crawler
 cpus: 8

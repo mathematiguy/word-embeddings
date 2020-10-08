@@ -45,7 +45,7 @@ $(PAPERS_DIR)/papers.csv: scripts/create_papers.py
 
 $(PAPERS_DIR)/corpus.txt: scripts/create_corpus.py $(PAPERS_DIR)/papers.csv
 	$(RUN) python3 $< --papers_csv $(PAPERS_DIR)/papers.csv \
-		--corpus_file $(PAPERS_DIR)/papers_corpus.txt \
+		--corpus_file $(PAPERS_DIR)/corpus.txt \
 		--log_level $(LOG_LEVEL)
 
 $(PAPERS_DIR)/corpus.shuf: $(PAPERS_DIR)/corpus.txt
@@ -57,7 +57,7 @@ $(PAPERS_DIR)/corpus.train: $(PAPERS_DIR)/corpus.shuf
 $(PAPERS_DIR)/corpus.test: $(PAPERS_DIR)/corpus.shuf
 	tail $< -n +$(shell expr `wc -l $< | awk '{print $$1}'` \* 8 / 10 + 1) > $@
 
-AUTOTUNE_DURATION ?= 300
+AUTOTUNE_DURATION ?= 30
 $(PAPERS_DIR)/fasttext_cbow.bin: $(PAPERS_DIR)/corpus.train $(PAPERS_DIR)/corpus.test
 	$(RUN) fasttext cbow -input $< -output $(basename $@) -minCount $(MIN_COUNT) \
 		-thread $(NUM_CORES) -autotune-duration $(AUTOTUNE_DURATION) \
