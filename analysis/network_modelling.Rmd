@@ -28,6 +28,9 @@ library(rjson)
 library(furrr)
 library(here)
 
+# A dumb edit
+library(testthat)
+
 # Use furr multiprocessing
 plan(multiprocess)
 
