@@ -55,7 +55,7 @@ $(PAPERS_DIR)/sentences.csv: embeddings/scripts/create_sentences.py $(PAPERS_DIR
 		--min_count $(MIN_COUNT) \
 		--log_level $(LOG_LEVEL)
 
-$(PAPERS_DIR)/corpus.txt: embeddings/scripts/create_corpus.py $(PAPERS_DIR)/papers.csv
+$(PAPERS_DIR)/corpus.txt: embeddings/scripts/create_corpus.py $(PAPERS_DIR)/sentences.csv
 	$(RUN) python3 $< --sentence_csv $(PAPERS_DIR)/sentences.csv \
 		--corpus_file $(PAPERS_DIR)/corpus.txt \
 		--log_level $(LOG_LEVEL)
