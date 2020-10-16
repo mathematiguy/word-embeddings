@@ -40,11 +40,23 @@ $(PAPERS_DIR)/papers.csv: embeddings/scripts/create_papers.py $(PAPERS_DIR)/pape
 	$(RUN) python3 $< \
 		--papers_json $(PAPERS_DIR)/papers.json \
 		--papers_csv $@ \
+		--log_level $(LOG_LEVEL)
+
+$(PAPERS_DIR)/paragraphs.csv: embeddings/scripts/create_paragraphs.py $(PAPERS_DIR)/papers.csv
+	$(RUN) python3 $< \
+		--papers_csv $(PAPERS_DIR)/papers.csv \
+		--paragraphs_csv $@ \
+		--log_level $(LOG_LEVEL)
+
+$(PAPERS_DIR)/sentences.csv: embeddings/scripts/create_sentences.py $(PAPERS_DIR)/paragraphs.csv
+	$(RUN) python3 $< \
+		--paragraphs_csv $(PAPERS_DIR)/paragraphs.csv \
+		--sentences_csv $@ \
 		--min_count $(MIN_COUNT) \
 		--log_level $(LOG_LEVEL)
 
 $(PAPERS_DIR)/corpus.txt: embeddings/scripts/create_corpus.py $(PAPERS_DIR)/papers.csv
-	$(RUN) python3 $< --papers_csv $(PAPERS_DIR)/papers.csv \
+	$(RUN) python3 $< --sentence_csv $(PAPERS_DIR)/sentences.csv \
 		--corpus_file $(PAPERS_DIR)/corpus.txt \
 		--log_level $(LOG_LEVEL)
 
