@@ -3,7 +3,7 @@ set -ex
 
 export RUN=
 export MIN_COUNT=30
-export AUTOTUNE_DURATION=1800
+export AUTOTUNE_DURATION=10800
 
 cd ..
 
