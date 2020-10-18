@@ -4,7 +4,7 @@ set -ex
 export RUN=
 
 cd ..
-cp /input/papers-past-embeddings/* data/
+cp /input/papers-past-embeddings/* data/papers/
 
 make notebooks
 
