@@ -47,6 +47,9 @@ def calculate_umap(params, umap_data, similarity_matrix):
     umap_data['x'] = reduced[:, 0]
     umap_data['y'] = reduced[:, 1]
 
+    umap_data['x'] = umap_data['x'] / (umap_data.x.max() - umap_data.x.min())
+    umap_data['y'] = umap_data['y'] / (umap_data.y.max() - umap_data.y.min())
+
     umap_data = umap_data[['n_neighbors', 'min_dist', 'word', 'count', 'x', 'y']]
 
     umap_data['rank'] = np.arange(len(umap_data))
@@ -64,7 +67,7 @@ def create_umap_json(umap_data):
     for i, row in umap_data.iterrows():
         umap_json.append({
             'word': row['word'],
-            'position': [row['x_coord'], row['y_coord']],
+            'position': [row['x_coord'], np.sqrt(1 - row['x_coord'] ** 2 - row['y_coord'] ** 2), row['y_coord']],
             'rank': row['rank'],
             'count': row['word_count']
 
