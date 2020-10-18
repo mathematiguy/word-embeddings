@@ -1,7 +1,5 @@
 docker: mathematiguy/papers-past:1ee460f
 requires:
-  - papers-past-embeddings
-allows:
   - papers-past-analysis
 cpus: 8
 memory: 16
