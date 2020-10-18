@@ -1,6 +1,6 @@
 docker: mathematiguy/papers-past:1ee460f
 requires:
-  - papers-past-embeddings
+  - papers-past-crawler
 triggers:
   - papers-past-analysis
 cpus: 8
