@@ -30,7 +30,7 @@ def create_word_counts(word_counts):
     with open(word_counts, 'r') as f:
         for line in f.read().strip().split('\n'):
             count, word = line.strip().split()
-            result.append({'word': word, 'count': count})
+            result.append({'word': word, 'count': int(count)})
 
     return pd.DataFrame.from_dict(result)
 
