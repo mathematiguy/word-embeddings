@@ -48,21 +48,38 @@ Here is some text
 
 ```{r load-data}
 
-model = fastrtext::load_model(here('data/fasttext.bin'))
-model_data <- read_csv(here('data/model_data.csv'))
-model_data
+model = fastrtext::load_model(here('data/papers/fasttext_cbow.bin'))
+sentences = read_csv(here('data/papers/sentences.csv'))
+word_counts = read_table(here('data/papers/word_counts.txt'), col_names = c('count', 'word'))
+
+word_vectors = read_table(
+    here('data/papers/fasttext_cbow.vec'),
+    col_names = 'data',
+    skip = 1) %>%
+    separate(data, into = c('word', paste0('x_', 1:100)), sep = ' ') %>%
+    mutate_at(vars(starts_with('x_')), as.numeric) %>%
+    filter(word != '</s>')
+
+word_vectors
+
+word_vectors %>%
+    gather(starts_with("x_"), key = 'coordinate', value = 'score') %>%
+    arrange(word, coordinate) %>%
+    group_by(word) %>%
+    summarise(vector = map(list(score), function (x) x / sqrt(sum(x ^ 2))))
+
 
 ```
 
 ```{r get-similarity-hist, fig.width=5, fig.height=3}
 
-word_vectors <- get_word_vectors(model, words = model_data$word) %>%
+word_vectors <- get_word_vectors(model, words = word_counts$word) %>%
     apply(1, function(x) {x / sqrt(sum(x^2))})
 
 similarity <- t(word_vectors) %*% word_vectors %>%
     as_tibble() %>%
     gather(key = 'word1', value = 'score') %>%
-    mutate(word2 = rep(model_data$word, nrow(model_data))) %>%
+    mutate(word2 = rep(word_counts$word, nrow(word_counts))) %>%
     select(word1, word2, score) %>%
     filter(word1 < word2)
 
@@ -111,9 +128,28 @@ G %>%
 
 ## Shortest paths
 
+
+```{r}
+
+library(stringi)
+
+path_examples = read_csv(here('data/papers/path_examples.csv'))
+
+path_examples %>%
+    mutate_all(function(x) str_replace_all(str_to_lower(x), ' ', '_')) %>%
+    mutate_all(function(x) stri_trans_general(str = x, id = "Latin-ASCII")) %>%
+    mutate(in_vocab_1 = kupu_1 %in% V(G)$name,
+           in_vocab_2 = kupu_2 %in% V(G)$name) %>%
+    filter(in_vocab_1 & in_vocab_2) %>%
+    mutate(path = map2_chr( kupu_1, kupu_2, function(x,y) paste(shortest_paths(G, x, y)$vpath, collapse = ' ')))
+
+```
+
 ```{r shortest-paths}
 
-shortest_paths(G, 'whakaminenga', 'mohi_tawhai')
+shortest_paths(G, 'tangata', 'whanau')$vpath
+
+# all_simple_paths(G, 'materoa')
 
 ```
 
@@ -125,13 +161,13 @@ diameter(G)
 
 farthest_vertices(G)
 
-shortest_paths(G, 'iho', 'kuhu')
+shortest_paths(G, 'ko', 'raiwhara')
 
 ```
 
 ## All shortest paths
 
-```{r}
+```{r all-shortest-paths}
 
 iho_to_kuhu <- all_shortest_paths(G, 'iho', 'kuhu')$res
 
