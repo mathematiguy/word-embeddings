@@ -17,7 +17,7 @@ MIN_COUNT ?= 30  # Minimum number of occurrences to keep a word in the corpus
 .PHONY: web_server crawl notebooks shiny r_session jupyter ipython clean docker \
 	docker-push docker-pull enter enter-root
 
-all: $(PAPERS_DIR)/fasttext_cbow.bin $(PAPERS_DIR)/word_counts.txt
+all: $(PAPERS_DIR)/umap.json
 
 web_server: PORT=-p 8000:8000
 web_server:
@@ -69,14 +69,20 @@ $(PAPERS_DIR)/corpus.train: $(PAPERS_DIR)/corpus.shuf
 $(PAPERS_DIR)/corpus.test: $(PAPERS_DIR)/corpus.shuf
 	tail $< -n +$(shell expr `wc -l $< | awk '{print $$1}'` \* 8 / 10 + 1) > $@
 
+MAX_N ?= 1
 AUTOTUNE_DURATION ?= 30
 $(PAPERS_DIR)/fasttext_cbow.bin: $(PAPERS_DIR)/corpus.train $(PAPERS_DIR)/corpus.test
 	$(RUN) fasttext cbow -input $< -output $(basename $@) -minCount $(MIN_COUNT) \
-		-thread $(NUM_CORES) -autotune-duration $(AUTOTUNE_DURATION) \
+		-thread $(NUM_CORES) -autotune-duration $(AUTOTUNE_DURATION) -maxn $(MAX_N) \
 		-autotune-validation $(PAPERS_DIR)/corpus.test
 
 $(PAPERS_DIR)/word_counts.txt: $(PAPERS_DIR)/corpus.txt
-	$(RUN) cat $< | grep -oE '[a-zāēīōū]+' | sort | uniq -c | sort -nr | awk '($$1 >= $(MIN_COUNT))' > $@
+	$(RUN) cat $< | grep -oE '[a-zāēīōū_]+' | sort | uniq -c | sort -nr | awk '($$1 >= $(MIN_COUNT))' > $@
+
+$(PAPERS_DIR)/umap.json: embeddings/scripts/create_umap.py $(PAPERS_DIR)/fasttext_cbow.bin $(PAPERS_DIR)/word_counts.txt
+	$(RUN) python3 $< --word_vectors $(PAPERS_DIR)/fasttext_cbow.vec \
+		--word_counts $(PAPERS_DIR)/word_counts.txt --umap_file $@ \
+		--log_level $(LOG_LEVEL)
 
 shiny: DOCKER_ARGS= -p 7727:7727
 shiny:
