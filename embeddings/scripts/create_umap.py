@@ -65,9 +65,9 @@ def create_umap_json(umap_data):
 
     precis = 4
     scale = 1000
-    umap_json = []
+    umap_json = {'data': []}
     for i, row in umap_data.iterrows():
-        umap_json.append({
+        umap_json['data'].append({
             'word': row['word'],
             'position': [round(row['x_coord'] * scale, precis),
                          round(np.sqrt(1 - row['x_coord'] ** 2 - row['y_coord'] ** 2) * scale, precis),
