@@ -3,3 +3,5 @@ requires:
   - papers-past-crawler
   - papers-past-embeddings
 publish: papers-past/starmap
+cpus: 2
+memory: 4
