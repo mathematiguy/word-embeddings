@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "moduleResolution": "node",
+    "resolveJsonModule": true
+  },
+  "include": [
+    "./src/**/*.ts"
+  ],
+}
