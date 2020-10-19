@@ -11,7 +11,7 @@ cp /input/papers-past-crawler/papers.json data/papers/
 cp /input/papers-past-embeddings/umap.json data/papers/
 
 # Build the starmap front end
-make starmap -d
+make starmap
 
 # Show the starmap directory
 ls starmap
