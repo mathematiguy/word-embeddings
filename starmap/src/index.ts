@@ -2,6 +2,13 @@ import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { NAVY, WHITE } from "./colours";
 
+interface Kupu {
+  word: string;
+  position: [number, number, number];
+  rank: number;
+  count: number;
+}
+
 function docReady(fn) {
   // see if DOM is already available
   if (document.readyState === "complete" || document.readyState === "interactive") {
@@ -12,15 +19,37 @@ function docReady(fn) {
   }
 }
 
+const buildFontMesh = (text:string, font: THREE.Font) => {
+  const matDark = new THREE.LineBasicMaterial({
+    color: WHITE,
+    side: THREE.DoubleSide
+  });
+  const fontShapes = font.generateShapes(text, 8);
+  const geometry = new THREE.ShapeBufferGeometry(fontShapes);
+  return new THREE.Mesh(geometry, matDark);
+}
+
 const loadDataAndPlaceStars = async (scene: THREE.Scene) => {
   const {data} = await import("../umap.json");
-  data.forEach((kupu) => {
+  const font = await initFont();
+
+
+  data.forEach((kupu: Kupu) => {
     var geometry = new THREE.SphereGeometry(1, 6, 6);
     var material = new THREE.MeshBasicMaterial({ color: WHITE });
     var sphere = new THREE.Mesh(geometry, material);
+    // const text = buildFontMesh(kupu.word.replace(/_/g, " "), font);
+    // text.position.set(kupu.position[0] + 10, kupu.position[1], kupu.position[2])
+    // scene.add(text);
     sphere.position.set(kupu.position[0], kupu.position[1], kupu.position[2]);
     scene.add(sphere);
   })
+}
+
+const initFont = async () => {
+  const fontLoader = new THREE.FontLoader();
+  const NotoSerifBoldItalic = await import("../assets/fonts/Noto Serif_Bold Italic.json");
+  return fontLoader.parse(NotoSerifBoldItalic)
 }
 
 const initControls = (camera: THREE.Camera, domElement: HTMLCanvasElement) =>{
