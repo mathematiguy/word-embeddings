@@ -14,11 +14,12 @@ cd ..
 # Send /input to data/papers directory
 cp /input/papers-past-crawler/papers.json data/papers/
 cp /input/papers-past-embeddings/* data/papers/
+touch data/papers/*
 
 ls -la data/papers
 
 # Build the starmap front end
-make -o starmap
+make starmap
 
 # Show the starmap directory
 ls starmap
