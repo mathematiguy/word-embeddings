@@ -1,5 +1,6 @@
 import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
+import { NAVY, WHITE } from "./colours";
 
 function docReady(fn) {
   // see if DOM is already available
@@ -15,7 +16,7 @@ const loadDataAndPlaceStars = async (scene: THREE.Scene) => {
   const {data} = await import("../umap.json");
   data.forEach((kupu) => {
     var geometry = new THREE.SphereGeometry(1, 6, 6);
-    var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    var material = new THREE.MeshBasicMaterial({ color: WHITE });
     var sphere = new THREE.Mesh(geometry, material);
     sphere.position.set(kupu.position[0], kupu.position[1], kupu.position[2]);
     scene.add(sphere);
@@ -43,7 +44,7 @@ const init = async () => {
   const controls = initControls(camera, renderer.domElement)
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x182332);
+  scene.background = new THREE.Color(NAVY);
 
   scene.add(camera)
 
