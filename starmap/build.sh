@@ -18,7 +18,7 @@ cp /input/papers-past-embeddings/* data/papers/
 ls -la data/papers
 
 # Build the starmap front end
-make starmap -o
+make -o starmap
 
 # Show the starmap directory
 ls starmap
