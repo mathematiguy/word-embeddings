@@ -7,3 +7,6 @@
 **/*.log
 **/*.tex
 data/*
+**/node_modules
+starmap/dist
+starmap/.cache
