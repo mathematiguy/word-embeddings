@@ -30,7 +30,7 @@ const buildFontMesh = (text:string, font: THREE.Font) => {
 }
 
 const loadDataAndPlaceStars = async (scene: THREE.Scene) => {
-  const {data} = await import("../umap.json");
+  const { data } = await import("../../data/papers/umap.json");
   const font = await initFont();
 
 

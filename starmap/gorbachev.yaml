@@ -1,0 +1,7 @@
+docker: mathematiguy/papers-past:14f9cfe
+requires:
+  - papers-past-crawler
+  - papers-past-embeddings
+publish: papers-past/starmap
+cpus: 2
+memory: 4

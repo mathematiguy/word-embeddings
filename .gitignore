@@ -6,8 +6,9 @@
 **/*.bib
 **/*.log
 **/*.tex
+**/*.md
 data/*
 **/node_modules
 starmap/dist
 starmap/.cache
-starmap/umap.json
+starmap/v8-compile-cache-0
