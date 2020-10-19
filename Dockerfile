@@ -23,3 +23,6 @@ RUN pip3 install -r /root/requirements.txt
 
 ENV NLTK_DATA /nltk_data
 RUN python3 -c "import nltk;nltk.download('punkt', download_dir='$NLTK_DATA')"
+
+RUN apt update
+RUN apt install -y nodejs-dev node-gyp libssl1.0-dev npm

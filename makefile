@@ -15,13 +15,9 @@ PAPERS_DIR ?= data/papers
 MIN_COUNT ?= 30  # Minimum number of occurrences to keep a word in the corpus
 
 .PHONY: web_server crawl notebooks shiny r_session jupyter ipython clean docker \
-	docker-push docker-pull enter enter-root
+	docker-push docker-pull enter enter-root starmap
 
 all: $(PAPERS_DIR)/umap.json
-
-web_server: PORT=-p 8000:8000
-web_server:
-	(cd wordmap && $(RUN_IMAGE) python3 -m http.server)
 
 crawl: $(PAPERS_DIR)/papers.json
 $(PAPERS_DIR)/papers.json:
@@ -83,6 +79,15 @@ $(PAPERS_DIR)/umap.json: embeddings/scripts/create_umap.py $(PAPERS_DIR)/fasttex
 	$(RUN) python3 $< --word_vectors $(PAPERS_DIR)/fasttext_cbow.vec \
 		--word_counts $(PAPERS_DIR)/word_counts.txt --umap_file $@ \
 		--log_level $(LOG_LEVEL)
+
+starmap: UID=root
+starmap: GID=root
+starmap:
+	$(RUN) bash -c 'cd starmap && npm i && npm run build'
+
+web_server: PORT=-p 8000:8000
+web_server:
+	(cd starmap/dist && $(RUN_IMAGE) python3 -m http.server)
 
 shiny: DOCKER_ARGS= -p 7727:7727
 shiny:

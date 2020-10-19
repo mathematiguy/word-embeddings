@@ -13,7 +13,7 @@ function docReady(fn) {
 }
 
 const loadDataAndPlaceStars = async (scene: THREE.Scene) => {
-  const {data} = await import("../umap.json");
+  const {data} = await import("../../data/papers/umap.json");
   data.forEach((kupu) => {
     var geometry = new THREE.SphereGeometry(1, 6, 6);
     var material = new THREE.MeshBasicMaterial({ color: WHITE });

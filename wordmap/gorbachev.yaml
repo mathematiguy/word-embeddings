@@ -1,2 +1,4 @@
 docker: redis:4
+requires:
+  - papers-past-embeddings
 publish: papers-past
