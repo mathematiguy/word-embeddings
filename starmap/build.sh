@@ -3,11 +3,6 @@
 set -ex
 
 export RUN=
-export MIN_COUNT=30
-export AUTOTUNE_DURATION=600
-
-# Hyperparameters
-export MAX_N=6  # default: 6
 
 cd ..
 
