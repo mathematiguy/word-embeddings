@@ -37,16 +37,25 @@ const init = async () => {
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
+
   
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
   camera.position.set(0, 0, 0.01);
 
-  const controls = initControls(camera, renderer.domElement)
+  renderer.domElement.addEventListener("wheel", (e: WheelEvent) => {
+    e.preventDefault();
+    const newZoomLevel = camera.fov + e.deltaY 
+    if (newZoomLevel <= 45 && newZoomLevel >= 5 ){
+      camera.fov = newZoomLevel;
+      camera.updateProjectionMatrix();
+    }
+  })
 
+  const controls = initControls(camera, renderer.domElement)
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(NAVY);
-
   scene.add(camera)
+
 
   return {scene, controls, renderer, camera}
 }
