@@ -64,13 +64,14 @@ def calculate_umap(params, umap_data, similarity_matrix):
 def create_umap_json(umap_data):
 
     precis = 4
+    scale = 1000
     umap_json = []
     for i, row in umap_data.iterrows():
         umap_json.append({
             'word': row['word'],
-            'position': [round(row['x_coord'], precis),
-                         round(np.sqrt(1 - row['x_coord'] ** 2 - row['y_coord'] ** 2), precis),
-                         round(row['y_coord'], precis)],
+            'position': [round(row['x_coord'] * scale, precis),
+                         round(np.sqrt(1 - row['x_coord'] ** 2 - row['y_coord'] ** 2) * scale, precis),
+                         round(row['y_coord'] * scale, precis)],
             'rank': row['rank'],
             'count': row['word_count']
 
