@@ -65,7 +65,7 @@ $(PAPERS_DIR)/corpus.train: $(PAPERS_DIR)/corpus.shuf
 $(PAPERS_DIR)/corpus.test: $(PAPERS_DIR)/corpus.shuf
 	tail $< -n +$(shell expr `wc -l $< | awk '{print $$1}'` \* 8 / 10 + 1) > $@
 
-MAX_N ?= 1
+MAX_N ?= 6
 AUTOTUNE_DURATION ?= 30
 $(PAPERS_DIR)/fasttext_cbow.bin: $(PAPERS_DIR)/corpus.train $(PAPERS_DIR)/corpus.test
 	$(RUN) fasttext cbow -input $< -output $(basename $@) -minCount $(MIN_COUNT) \
