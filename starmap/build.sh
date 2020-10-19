@@ -23,4 +23,4 @@ make starmap
 ls starmap
 
 # Send dist/ folder to /publish
-cp -r starmap/dist /publish
+cp -r starmap/dist/* /publish
