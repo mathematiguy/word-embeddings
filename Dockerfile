@@ -11,7 +11,7 @@ RUN Rscript -e 'install.packages("ggnetwork")'
 
 # Install python + other things
 RUN apt update
-RUN apt install -y python3-dev python3-pip nodejs-dev node-gyp libssl1.0-dev npm
+RUN apt install -y python3-dev python3-pip nodejs-dev node-gyp libssl1.0-dev npm tree
 
 COPY submodules/fastText /code/submodules/fastText
 WORKDIR /code/submodules/fastText

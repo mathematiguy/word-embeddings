@@ -82,7 +82,7 @@ $(PAPERS_DIR)/umap.json: embeddings/scripts/create_umap.py $(PAPERS_DIR)/fasttex
 
 starmap: UID=root
 starmap: GID=root
-starmap:
+starmap: $(PAPERS_DIR)/umap.json
 	$(RUN) bash -c 'cd starmap && npm i && npm run build'
 
 web_server: PORT=-p 8000:8000
