@@ -8,7 +8,7 @@ cd ..
 
 # Send /input to data/papers directory
 cp /input/papers-past-crawler/papers.json data/papers/
-cp /input/papers-past-embeddings/umap.json data/papers/
+cp /input/papers-past-embeddings/* data/papers/
 
 # Build the starmap front end
 make starmap
