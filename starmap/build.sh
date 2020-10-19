@@ -2,6 +2,8 @@
 
 set -ex
 
+export RUN=
+
 cd ..
 
 # Send /input to data/papers directory
