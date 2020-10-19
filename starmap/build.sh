@@ -9,8 +9,10 @@ cd ..
 # Send /input to data/papers directory
 cp /input/papers-past-embeddings/umap.json data/papers/
 
+ls data/papers
+
 # Build the starmap front end
-make starmap
+make starmap -d
 
 # Show the starmap directory
 ls starmap
