@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "es6",
     "moduleResolution": "node",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "module": "esnext",
   },
   "include": [
     "./src/**/*.ts"
