@@ -86,34 +86,53 @@ const initControls = (camera: THREE.Camera, domElement: HTMLCanvasElement) =>{
   return controls
 }
 
-const init = async () => {
+const initRenderer = () => {
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  
+  return renderer
+}
+
+const initCamera = () => {
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
   camera.position.set(0, 0, 0.01);
   camera.name = "camera"
 
+  return camera
+}
+
+
+const initZoomListener = (camera: THREE.PerspectiveCamera, renderer: THREE.Renderer) => {
   renderer.domElement.addEventListener("wheel", (e: WheelEvent) => {
     e.preventDefault();
-    const newZoomLevel = camera.fov + e.deltaY 
-    if (newZoomLevel <= 45 && newZoomLevel >= 5 ){
+    const newZoomLevel = camera.fov + e.deltaY;
+    if (newZoomLevel <= 45 && newZoomLevel >= 5) {
       camera.fov = newZoomLevel;
       camera.updateProjectionMatrix();
     }
   })
+}
 
-  const controls = initControls(camera, renderer.domElement)
+const initScene = (camera: THREE.PerspectiveCamera) => {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(NAVY);
   scene.add(camera)
 
+  return scene
+}
+
+const init = async () => {
+  const renderer = initRenderer();
+  const camera = initCamera();
+  const controls = initControls(camera, renderer.domElement);
+  const scene = initScene(camera);
+  initZoomListener(camera, renderer);
+
   return {scene, controls, renderer, camera}
 }
 
-const kupuInView = (camera: THREE.Camera, kupuData: Kupu[], controls: OrbitControls) => {
+const kupuInView = (camera: THREE.PerspectiveCamera, kupuData: Kupu[]) => {
   const frustum = new THREE.Frustum;
   const baseMatrix = camera.projectionMatrix.clone()
   frustum.setFromProjectionMatrix(baseMatrix.multiply(camera.matrixWorldInverse.clone()));
@@ -136,7 +155,7 @@ docReady(async () => {
     controls.update(); // required when damping is enabled
     renderer.render(scene, camera);
     if (camera.fov < 10) {
-      const visibleKupu = kupuInView(camera, kupuData, controls)
+      const visibleKupu = kupuInView(camera, kupuData)
       buildKupuLabels(scene, visibleKupu, font)
     }
   };
