@@ -19,6 +19,14 @@ function docReady(fn) {
   }
 }
 
+const toTitleCase = (phrase) => {
+  return phrase
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 const buildFontMesh = (text: string, font: THREE.Font, material: THREE.LineBasicMaterial): Promise<THREE.Mesh<THREE.ShapeBufferGeometry, THREE.LineBasicMaterial>> => {
 
   return new Promise((resolve)=>{
@@ -43,7 +51,7 @@ const buildKupuLabels = async (scene: THREE.Scene, kupuData: Kupu[], font: THREE
     if (kupuLabelMap[kupu.word]){
       return
     }
-    const text = await buildFontMesh(kupu.word.replace(/_/g, " "), font, matDark);
+    const text = await buildFontMesh(toTitleCase(kupu.word.replace(/_/g, " ")), font, matDark);
     text.position.set(kupu.position[0], kupu.position[1], kupu.position[2]);
     text.lookAt(camera.position);
     scene.add(text);
