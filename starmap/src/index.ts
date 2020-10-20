@@ -135,7 +135,7 @@ docReady(async () => {
     requestAnimationFrame(animate);
     controls.update(); // required when damping is enabled
     renderer.render(scene, camera);
-    if (camera.fov < 7) {
+    if (camera.fov < 10) {
       const visibleKupu = kupuInView(camera, kupuData, controls)
       buildKupuLabels(scene, visibleKupu, font)
     }
