@@ -9,7 +9,7 @@ interface Kupu {
   count: number;
 }
 
-function docReady(fn) {
+function docReady(fn: () => void ) {
   // see if DOM is already available
   if (document.readyState === "complete" || document.readyState === "interactive") {
     // call on next available tick
@@ -19,7 +19,7 @@ function docReady(fn) {
   }
 }
 
-const toTitleCase = (phrase) => {
+const toTitleCase = (phrase: string) => {
   return phrase
     .toLowerCase()
     .split(' ')
@@ -28,8 +28,7 @@ const toTitleCase = (phrase) => {
 };
 
 const buildFontMesh = (text: string, font: THREE.Font, material: THREE.LineBasicMaterial): Promise<THREE.Mesh<THREE.ShapeBufferGeometry, THREE.LineBasicMaterial>> => {
-
-  return new Promise((resolve)=>{
+  return new Promise( (resolve) => {
     const fontShapes = font.generateShapes(text, 2);
     const geometry = new THREE.ShapeBufferGeometry(fontShapes, 1.5);
     const mesh = new THREE.Mesh(geometry, material)
