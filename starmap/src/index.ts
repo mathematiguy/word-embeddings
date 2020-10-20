@@ -148,6 +148,7 @@ const kupuInView = (camera: THREE.PerspectiveCamera, kupuData: Kupu[]) => {
   const frustum = new THREE.Frustum;
   const baseMatrix = camera.projectionMatrix.clone()
   frustum.setFromProjectionMatrix(baseMatrix.multiply(camera.matrixWorldInverse.clone()));
+
   return kupuData.filter( 
     (kupu) => (
       frustum.containsPoint( new THREE.Vector3(kupu.position[0], kupu.position[1], kupu.position[2]) )
