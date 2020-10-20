@@ -49,6 +49,7 @@ const buildKupuLabels = async (scene: THREE.Scene, kupuData: Kupu[], font: THREE
   const camera = scene.getObjectByName("camera")
   kupuData.forEach( async (kupu: Kupu) => {
     if (kupuLabelMap[kupu.word]){
+      kupuLabelMap[kupu.word].visible = true;
       return
     }
     const text = await buildFontMesh(toTitleCase(kupu.word.replace(/_/g, " ")), font, matDark);
@@ -56,6 +57,13 @@ const buildKupuLabels = async (scene: THREE.Scene, kupuData: Kupu[], font: THREE
     text.lookAt(camera.position);
     scene.add(text);
     kupuLabelMap[kupu.word] = text
+  })
+}
+
+const hideAllKupuLabels = () => {
+  Object.keys(kupuLabelMap)
+  .forEach((key)=>{
+    kupuLabelMap[key].visible = false;
   })
 }
 
@@ -88,6 +96,7 @@ const initControls = (camera: THREE.Camera, domElement: HTMLCanvasElement) =>{
 
 const initRenderer = () => {
   const renderer = new THREE.WebGLRenderer();
+  renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
@@ -110,6 +119,9 @@ const initZoomListener = (camera: THREE.PerspectiveCamera, renderer: THREE.Rende
     if (newZoomLevel <= 45 && newZoomLevel >= 5) {
       camera.fov = newZoomLevel;
       camera.updateProjectionMatrix();
+    }
+    if (newZoomLevel > 10){
+      hideAllKupuLabels();
     }
   })
 }
