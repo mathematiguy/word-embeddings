@@ -2,7 +2,6 @@ import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { NAVY, WHITE } from "./colours";
 import PointTexture from "../assets/textures/point.png"
-import 'requestidlecallback-polyfill';
 
 interface Kupu {
   word: string;
@@ -182,7 +181,6 @@ docReady(async () => {
   const pointMaterial = new THREE.PointsMaterial({ color: WHITE, map:sprite});
   const pointCloud = buildPointCloud(pointMaterial, kupuData)
   scene.add(pointCloud)
-  window.requestIdleCallback(() => { console.log("idle"); }, { timeout: 300 })
 
   addRenderFunc(()=>{
     const defaultSize = 1.5;
