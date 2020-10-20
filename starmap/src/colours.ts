@@ -1,2 +1,2 @@
-export const WHITE = 0xffffff
-export const NAVY = 0x182332
+export const WHITE = 0xEEEEEE;
+export const NAVY = 0x182332;

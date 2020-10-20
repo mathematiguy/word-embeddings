@@ -1,6 +1,7 @@
 import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { NAVY, WHITE } from "./colours";
+import PointTexture from "../assets/textures/point.png"
 
 interface Kupu {
   word: string;
@@ -66,15 +67,15 @@ const hideAllKupuLabels = () => {
   })
 }
 
-const loadDataAndPlaceStars = async (scene: THREE.Scene, kupuData: Kupu[]) => {
-  kupuData.forEach((kupu: Kupu) => {
-    var geometry = new THREE.SphereGeometry(1, 6, 6);
-    var material = new THREE.MeshBasicMaterial({ color: WHITE });
-    var sphere = new THREE.Mesh(geometry, material);
+const buildPointCloud = (material, kupuData: Kupu[]) => {
+  const vertices = kupuData.reduce((accum, kupu) => ([...accum, ...kupu.position]) ,[])
 
-    sphere.position.set(kupu.position[0], kupu.position[1], kupu.position[2]);
-    scene.add(sphere);
-  })
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+  const points = new THREE.Points(geometry, material);
+
+  return points
 }
 
 const initFont = async () => {
@@ -139,8 +140,10 @@ const init = async () => {
   const controls = initControls(camera, renderer.domElement);
   const scene = initScene(camera);
   initZoomListener(camera, renderer);
+  const font = await initFont();
 
-  return {scene, controls, renderer, camera}
+
+  return { scene, controls, renderer, camera, font}
 }
 
 const kupuInView = (camera: THREE.PerspectiveCamera, kupuData: Kupu[]) => {
@@ -156,21 +159,28 @@ const kupuInView = (camera: THREE.PerspectiveCamera, kupuData: Kupu[]) => {
 }
 
 docReady(async () => {
-  const { scene, controls, renderer, camera} = await init()
+  const { scene, controls, renderer, camera, font} = await init()
   const umap = await import("../../data/papers/umap.json");
-  const font = await initFont();
   const kupuData: Kupu[] = umap.data as Kupu[]
+  const sprite = new THREE.TextureLoader().load(PointTexture);
+  const pointMaterial = new THREE.PointsMaterial({ color: WHITE, map:sprite});
+  const pointCloud = buildPointCloud(pointMaterial, kupuData)
+  scene.add(pointCloud)
 
-  await loadDataAndPlaceStars(scene, kupuData)
   const animate = () => {
     requestAnimationFrame(animate);
     controls.update(); // required when damping is enabled
     renderer.render(scene, camera);
+
+    const defaultSize = 1.5;
+    pointMaterial.size = defaultSize / Math.tan((Math.PI / 180) * camera.fov / 2);
+
     if (camera.fov < 10) {
       const visibleKupu = kupuInView(camera, kupuData)
       buildKupuLabels(scene, visibleKupu, font)
     }
   };
+
   animate();
 
 });
