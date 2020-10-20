@@ -22,7 +22,7 @@ function docReady(fn) {
 const buildFontMesh = (text: string, font: THREE.Font, material: THREE.LineBasicMaterial): Promise<THREE.Mesh<THREE.ShapeBufferGeometry, THREE.LineBasicMaterial>> => {
 
   return new Promise((resolve)=>{
-    const fontShapes = font.generateShapes(text, 8);
+    const fontShapes = font.generateShapes(text, 2);
     const geometry = new THREE.ShapeBufferGeometry(fontShapes, 1.5);
     const mesh = new THREE.Mesh(geometry, material)
     resolve(mesh)
@@ -38,12 +38,14 @@ const buildKupuLabels = async (scene: THREE.Scene, kupuData: Kupu[], font: THREE
     color: WHITE,
     side: THREE.FrontSide
   });
+  const camera = scene.getObjectByName("camera")
   kupuData.forEach( async (kupu: Kupu) => {
     if (kupuLabelMap[kupu.word]){
       return
     }
     const text = await buildFontMesh(kupu.word.replace(/_/g, " "), font, matDark);
-    text.position.set(kupu.position[0] + 10, kupu.position[1], kupu.position[2])
+    text.position.set(kupu.position[0], kupu.position[1], kupu.position[2]);
+    text.lookAt(camera.position);
     scene.add(text);
     kupuLabelMap[kupu.word] = text
   })
@@ -84,6 +86,7 @@ const init = async () => {
   
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
   camera.position.set(0, 0, 0.01);
+  camera.name = "camera"
 
   renderer.domElement.addEventListener("wheel", (e: WheelEvent) => {
     e.preventDefault();
