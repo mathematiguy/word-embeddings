@@ -2,6 +2,7 @@ import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { NAVY, WHITE } from "./colours";
 import PointTexture from "../assets/textures/point.png"
+import 'requestidlecallback-polyfill';
 
 interface Kupu {
   word: string;
@@ -88,7 +89,6 @@ const initControls = (camera: THREE.Camera, domElement: HTMLCanvasElement) =>{
   const controls = new OrbitControls(camera, domElement);
   controls.enableZoom = false;
   controls.enablePan = false;
-  controls.enableDamping = true;
   controls.rotateSpeed = - 0.25;
 
   return controls
@@ -112,16 +112,18 @@ const initCamera = () => {
 }
 
 
-const initZoomListener = (camera: THREE.PerspectiveCamera, renderer: THREE.Renderer) => {
+const initZoomListener = (camera: THREE.PerspectiveCamera, renderer: THREE.Renderer, controls: OrbitControls, render:()=>void) => {
   renderer.domElement.addEventListener("wheel", (e: WheelEvent) => {
     e.preventDefault();
     const newZoomLevel = camera.fov + e.deltaY;
     if (newZoomLevel <= 45 && newZoomLevel >= 5) {
       camera.fov = newZoomLevel;
       camera.updateProjectionMatrix();
+      render()
     }
     if (newZoomLevel > 10){
       hideAllKupuLabels();
+      render()
     }
   })
 }
@@ -135,15 +137,24 @@ const initScene = (camera: THREE.PerspectiveCamera) => {
 }
 
 const init = async () => {
+  const renderFuncs = []
+  const render = () => {
+    renderFuncs.forEach(func => func())
+  };
+  const addRenderFunc = (func) => renderFuncs.push(func);
+  
   const renderer = initRenderer();
   const camera = initCamera();
   const controls = initControls(camera, renderer.domElement);
   const scene = initScene(camera);
-  initZoomListener(camera, renderer);
+  initZoomListener(camera, renderer, controls, render);
   const font = await initFont();
+  addRenderFunc(() => renderer.render(scene, camera))
+  
 
+  controls.addEventListener("change", render)
 
-  return { scene, controls, renderer, camera, font}
+  return { scene, controls, renderer, camera, font, addRenderFunc, render}
 }
 
 const kupuInView = (camera: THREE.PerspectiveCamera, kupuData: Kupu[]) => {
@@ -159,28 +170,25 @@ const kupuInView = (camera: THREE.PerspectiveCamera, kupuData: Kupu[]) => {
 }
 
 docReady(async () => {
-  const { scene, controls, renderer, camera, font} = await init()
+  const { scene, camera, font, addRenderFunc, render} = await init()
   const umap = await import("../../data/papers/umap.json");
   const kupuData: Kupu[] = umap.data as Kupu[]
   const sprite = new THREE.TextureLoader().load(PointTexture);
   const pointMaterial = new THREE.PointsMaterial({ color: WHITE, map:sprite});
   const pointCloud = buildPointCloud(pointMaterial, kupuData)
   scene.add(pointCloud)
+  window.requestIdleCallback(() => { console.log("idle"); }, { timeout: 300 })
 
-  const animate = () => {
-    requestAnimationFrame(animate);
-    controls.update(); // required when damping is enabled
-    renderer.render(scene, camera);
-
+  addRenderFunc(()=>{
     const defaultSize = 1.5;
     pointMaterial.size = defaultSize / Math.tan((Math.PI / 180) * camera.fov / 2);
 
     if (camera.fov < 10) {
-      const visibleKupu = kupuInView(camera, kupuData)
-      buildKupuLabels(scene, visibleKupu, font)
+      const visibleKupu = kupuInView(camera, kupuData);
+      buildKupuLabels(scene, visibleKupu, font);
     }
-  };
+  })
+  render();
 
-  animate();
 
 });
