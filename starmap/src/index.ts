@@ -31,8 +31,8 @@ const toTitleCase = (phrase: string) => {
 
 const buildFontMesh = (text: string, font: THREE.Font, material: THREE.LineBasicMaterial): Promise<THREE.Mesh<THREE.ShapeBufferGeometry, THREE.LineBasicMaterial>> => {
   return new Promise( (resolve) => {
-    const fontShapes = font.generateShapes(text, 2);
-    const geometry = new THREE.ShapeBufferGeometry(fontShapes, 1.5);
+    const fontShapes = font.generateShapes(text, 1.5);
+    const geometry = new THREE.ShapeBufferGeometry(fontShapes, 1);
     const mesh = new THREE.Mesh(geometry, material)
     resolve(mesh)
   })
@@ -56,6 +56,8 @@ const buildKupuLabels = async (scene: THREE.Scene, kupuData: Kupu[], font: THREE
     const text = await buildFontMesh(toTitleCase(kupu.word.replace(/_/g, " ")), font, matDark);
     text.position.set(kupu.position[0], kupu.position[1], kupu.position[2]);
     text.lookAt(camera.position);
+    text.translateY(-.8)
+    text.translateX(2)
     scene.add(text);
     kupuLabelMap[kupu.word] = text
   })
@@ -95,7 +97,10 @@ const initControls = (camera: THREE.Camera, domElement: HTMLCanvasElement) =>{
 }
 
 const initRenderer = () => {
-  const renderer = new THREE.WebGLRenderer();
+  const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    powerPreference: "high-performance",
+  });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
@@ -104,7 +109,7 @@ const initRenderer = () => {
 }
 
 const initCamera = () => {
-  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 500, 1100);
   camera.position.set(0, 0, 0.01);
   camera.name = "camera"
 
@@ -170,7 +175,7 @@ const kupuInView = (camera: THREE.PerspectiveCamera, kupuData: Kupu[]) => {
 }
 
 docReady(async () => {
-  const { scene, camera, font, addRenderFunc, render} = await init()
+  const { scene, camera, renderer, font, addRenderFunc, render} = await init()
   const umap = await import("../../data/papers/umap.json");
   const kupuData: Kupu[] = umap.data as Kupu[]
   const sprite = new THREE.TextureLoader().load(PointTexture);
