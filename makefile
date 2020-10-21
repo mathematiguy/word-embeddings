@@ -18,7 +18,7 @@ MIN_COUNT ?= 30  # Minimum number of occurrences to keep a word in the corpus
 .PHONY: starmap wordmap crawl shiny r_session jupyter ipython clean docker \
 	docker-push docker-pull enter enter-root
 
-all: $(PAPERS_DIR)/starmap.json
+all: starmap/starmap.json
 
 crawl: $(PAPERS_DIR)/papers.json
 $(PAPERS_DIR)/papers.json:
