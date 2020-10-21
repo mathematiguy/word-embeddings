@@ -7,6 +7,8 @@ export AUTOTUNE_DURATION=600
 
 # Hyperparameters
 export MAX_N=6  # default: 6
+export N_NEIGHBOURS=5
+export MIN_DIST=0.8
 
 cd ..
 

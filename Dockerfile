@@ -1,6 +1,7 @@
 FROM dragonflyscience/dragonverse-18.04
 
 USER root
+ENV NUMBA_CACHE_DIR /code
 
 RUN apt update
 
@@ -32,10 +33,10 @@ COPY requirements.txt /root/requirements.txt
 COPY submodules/reo-toolkit /code/submodules/reo-toolkit
 RUN pip3 install -r /root/requirements.txt
 
-# Add plotly extensions to jupyterlab
-RUN jupyter labextension install jupyterlab-plotly@4.11.0
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.11.0
-
 # Install nltk tokenizers package (punkt)
 ENV NLTK_DATA /nltk_data
 RUN python3 -c "import nltk;nltk.download('punkt', download_dir='$NLTK_DATA')"
+
+# Add plotly extensions to jupyterlab
+RUN jupyter labextension install jupyterlab-plotly@4.11.0
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.11.0

@@ -16,7 +16,7 @@ def create_vector_data(word_vectors):
         vector_data = f.read().strip().split('\n')
         rows, dims = vector_data[0].split()
 
-        vector_data = [(word, [float(v) for v in vec.split()])
+        vector_data = [(word, np.array([float(v) for v in vec.split()]))
                        for word, vec in map(lambda s: s.split(' ', 1), vector_data[1:])]
         vector_data = pd.DataFrame(vector_data)
 
