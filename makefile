@@ -103,9 +103,6 @@ wordmap: wordmap/newspapers/umap.csv
 wordmap/newspapers/umap.csv: $(PAPERS_DIR)/umap.csv
 	cp $< $@
 
-wordmap/newspapers/umap.csv: $(PAPERS_DIR)/umap.csv
-	cp $< $@
-
 shiny: DOCKER_ARGS= -p 7727:7727
 shiny:
 	$(RUN) Rscript shiny/global.R

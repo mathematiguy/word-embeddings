@@ -3,6 +3,7 @@ import json
 import click
 import numpy as np
 import pandas as pd
+from scipy.linalg import norm
 from utils import initialise_logger, multicore_apply
 
 from umap import UMAP
@@ -80,7 +81,8 @@ def main(word_vectors, word_counts, umap_file, n_neighbours, min_dist, metric, l
     vector_data = vector_data.merge(word_counts, on = 'word', how = 'inner')
 
     logger.info('Computing similarity matrix..')
-    word_vectors = np.vstack(vector_data.vector)
+    normalize = lambda x: x / norm(x)
+    word_vectors = np.vstack(vector_data.vector.apply(normalize))
     similarity_matrix = np.dot(word_vectors, word_vectors.transpose())
 
     logger.info('Running umap model..')
