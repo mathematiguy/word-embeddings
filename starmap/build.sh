@@ -15,10 +15,10 @@ cp /input/papers-past-embeddings/* data/papers/
 ls -la data/papers
 
 # Touch all dependencies for starmap
-make starmap -tB
+make starmap/starmap.json -tB
 
 # Build the starmap front end
-make starmap
+make starmap/dist/index.html
 
 # Show the starmap directory
 ls starmap
