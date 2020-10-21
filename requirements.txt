@@ -2,6 +2,7 @@
 numpy
 click
 fasttext
+gensim
 jupyter
 jupyterlab
 matplotlib
