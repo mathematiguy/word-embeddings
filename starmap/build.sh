@@ -18,7 +18,7 @@ ls -la data/papers
 make starmap/starmap.json -tB
 
 # Build the starmap front end
-make starmap
+make starmap/dist/index.html
 
 # Show the starmap directory
 ls starmap
