@@ -15,8 +15,8 @@ PAPERS_DIR ?= data/papers
 # Parameters
 MIN_COUNT ?= 30  # Minimum number of occurrences to keep a word in the corpus
 
-.PHONY: web_server crawl notebooks shiny r_session jupyter ipython clean docker \
-	docker-push docker-pull enter enter-root starmap
+.PHONY: starmap wordmap crawl shiny r_session jupyter ipython clean docker \
+	docker-push docker-pull enter enter-root
 
 all: $(PAPERS_DIR)/starmap.json
 
@@ -85,18 +85,19 @@ $(PAPERS_DIR)/umap.csv: embeddings/scripts/create_umap.py $(PAPERS_DIR)/fasttext
 		--n_neighbours $(N_NEIGHBOURS) --min_dist $(MIN_DIST) --metric $(METRIC) \
 		--log_level $(LOG_LEVEL)
 
-$(PAPERS_DIR)/starmap.json: embeddings/scripts/create_starmap.py $(PAPERS_DIR)/umap.csv
+starmap/starmap.json: embeddings/scripts/create_starmap.py $(PAPERS_DIR)/umap.csv
 	$(RUN) python3 $< --umap_csv $(PAPERS_DIR)/umap.csv --umap_json $@ --log_level $(LOG_LEVEL)
 
-starmap: UID=root
-starmap: GID=root
-starmap: PORT=-p 8000:8000
-starmap: $(PAPERS_DIR)/starmap.json
+starmap/dist/index.html: UID=root
+starmap/dist/index.html: GID=root
+starmap/dist/index.html: starmap/starmap.json
 	$(RUN) bash -c 'cd starmap && npm i && npm run build'
-	(cd starmap/dist && python3 -m http.server)
+
+starmap: DOCKER_ARGS=-p 8000:8000
+starmap: starmap/dist/index.html
+	$(RUN) bash -c 'cd starmap/dist && python3 -m http.server'
 
 wordmap: DOCKER_ARGS=-p 8000:8000
-wordmap: WORK_DIR=/code/wordmap/newspapers
 wordmap: wordmap/newspapers/umap.csv
 	$(RUN) python3 -m http.server
 

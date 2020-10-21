@@ -13,7 +13,7 @@ function docReady(fn) {
 }
 
 const loadDataAndPlaceStars = async (scene: THREE.Scene) => {
-  const {data} = await import("../../data/papers/umap.json");
+  const {data} = await import("../starmap.json");
   data.forEach((kupu) => {
     var geometry = new THREE.SphereGeometry(1, 6, 6);
     var material = new THREE.MeshBasicMaterial({ color: WHITE });
@@ -37,7 +37,7 @@ const init = async () => {
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
-  
+
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
   camera.position.set(0, 0, 0.01);
 
