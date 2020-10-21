@@ -8,6 +8,7 @@ cd ..
 
 # Send /input to data/papers directory
 cp /input/papers-past-crawler/papers.json data/papers/
+cp /input/papers-past-embeddings/starmap.json starmap/
 cp /input/papers-past-embeddings/* data/papers/
 
 # Show everything in data/papers
