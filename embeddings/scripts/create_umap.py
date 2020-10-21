@@ -36,9 +36,9 @@ def create_word_counts(word_counts):
 
 
 def calculate_umap(params, umap_data, similarity_matrix):
-    neighbors, dist = params
+    neighbors, dist, metric = params
 
-    reducer = UMAP(n_neighbors = neighbors, min_dist = dist)
+    reducer = UMAP(n_neighbors = neighbors, min_dist = dist, metric = metric, random_state = 42)
     reduced = reducer.fit_transform(similarity_matrix)
 
     umap_data['n_neighbors'] = neighbors
@@ -61,30 +61,15 @@ def calculate_umap(params, umap_data, similarity_matrix):
     return umap_data
 
 
-def create_umap_json(umap_data):
-
-    precis = 4
-    scale = 1000
-    umap_json = {'data': []}
-    for i, row in umap_data.iterrows():
-        umap_json['data'].append({
-            'word': row['word'],
-            'position': [round(row['x_coord'] * scale, precis),
-                         round(np.sqrt(1 - row['x_coord'] ** 2 - row['y_coord'] ** 2) * scale, precis),
-                         round(row['y_coord'] * scale, precis)],
-            'rank': row['rank'],
-            'count': row['word_count']
-
-        })
-    return umap_json
-
-
 @click.command()
 @click.option('--word_vectors', help='Path to fasttext.vec')
 @click.option('--word_counts', help='Path to word_counts.txt')
 @click.option('--umap_file', help='Path to save umap.json')
+@click.option('--n_neighbours', type=int, help='This parameter controls how UMAP balances local versus global structure in the data.')
+@click.option('--min_dist', type=float, help='Controls how tightly UMAP is allowed to pack points together')
+@click.option('--metric', help='This controls how distance is computed in the ambient space of the input data')
 @click.option('--log_level', default='INFO', help='Log level (default: INFO)')
-def main(word_vectors, word_counts, umap_file, log_level):
+def main(word_vectors, word_counts, umap_file, n_neighbours, min_dist, metric, log_level):
 
     global logger
     logger = initialise_logger(log_level, __file__)
@@ -101,12 +86,9 @@ def main(word_vectors, word_counts, umap_file, log_level):
     logger.info('Running umap model..')
     n_neighbours = 4
     min_dist = 0.8
-    umap_data = calculate_umap([n_neighbours, min_dist], vector_data, similarity_matrix)
+    umap_data = calculate_umap([n_neighbours, min_dist, metric], vector_data, similarity_matrix)
 
-    logger.info("Saving output to {}".format(umap_file))
-    umap_json = create_umap_json(umap_data)
-    with open(umap_file, 'w') as f:
-        f.write(json.dumps(umap_json))
+    umap_data.to_csv(umap_file, index = False)
 
     logger.info('Done!')
 

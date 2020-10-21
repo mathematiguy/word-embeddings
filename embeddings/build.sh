@@ -20,4 +20,4 @@ du -sh data/papers/*
 mv data/papers/corpus.txt data/papers/corpus.train \
    data/papers/corpus.test data/papers/word_counts.txt \
    data/papers/fasttext_cbow.bin data/papers/fasttext_cbow.vec \
-   data/papers/*.csv data/papers/umap.json /output
+   data/papers/*.csv data/papers/starmap.json /output

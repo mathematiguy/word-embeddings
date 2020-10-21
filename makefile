@@ -1,9 +1,10 @@
 DOCKER_REGISTRY := mathematiguy
 IMAGE_NAME := $(shell basename `git rev-parse --show-toplevel` | tr '[:upper:]' '[:lower:]')
 IMAGE := $(DOCKER_REGISTRY)/$(IMAGE_NAME)
-RUN ?= docker run $(DOCKER_ARGS) --rm -v $$(pwd):/code -w /code -u $(UID):$(GID) $(IMAGE)
+RUN ?= docker run $(DOCKER_ARGS) --rm -v $$(pwd):/code -w $(WORK_DIR) -u $(UID):$(GID) $(IMAGE)
 UID ?= $(shell id -u)
 GID ?= $(shell id -g)
+WORK_DIR ?= /code
 DOCKER_ARGS ?=
 GIT_TAG ?= $(shell git log --oneline | head -n1 | awk '{print $$1}')
 LOG_LEVEL ?= INFO
@@ -17,7 +18,7 @@ MIN_COUNT ?= 30  # Minimum number of occurrences to keep a word in the corpus
 .PHONY: web_server crawl notebooks shiny r_session jupyter ipython clean docker \
 	docker-push docker-pull enter enter-root starmap
 
-all: $(PAPERS_DIR)/umap.json
+all: $(PAPERS_DIR)/starmap.json
 
 crawl: $(PAPERS_DIR)/papers.json
 $(PAPERS_DIR)/papers.json:
@@ -75,19 +76,35 @@ $(PAPERS_DIR)/fasttext_cbow.bin: $(PAPERS_DIR)/corpus.train $(PAPERS_DIR)/corpus
 $(PAPERS_DIR)/word_counts.txt: $(PAPERS_DIR)/corpus.txt
 	$(RUN) cat $< | grep -oE '[a-zāēīōū_]+' | sort | uniq -c | sort -nr | awk '($$1 >= $(MIN_COUNT))' > $@
 
-$(PAPERS_DIR)/umap.json: embeddings/scripts/create_umap.py $(PAPERS_DIR)/fasttext_cbow.bin $(PAPERS_DIR)/word_counts.txt
+N_NEIGHBOURS ?= 4
+MIN_DIST ?= 0.8
+METRIC ?= euclidean
+$(PAPERS_DIR)/umap.csv: embeddings/scripts/create_umap.py $(PAPERS_DIR)/fasttext_cbow.bin $(PAPERS_DIR)/word_counts.txt
 	$(RUN) python3 $< --word_vectors $(PAPERS_DIR)/fasttext_cbow.vec \
 		--word_counts $(PAPERS_DIR)/word_counts.txt --umap_file $@ \
+		--n_neighbours $(N_NEIGHBOURS) --min_dist $(MIN_DIST) --metric $(METRIC) \
 		--log_level $(LOG_LEVEL)
+
+$(PAPERS_DIR)/starmap.json: embeddings/scripts/create_starmap.py $(PAPERS_DIR)/umap.csv
+	$(RUN) python3 $< --umap_csv $(PAPERS_DIR)/umap.csv --umap_json $@ --log_level $(LOG_LEVEL)
 
 starmap: UID=root
 starmap: GID=root
-starmap: $(PAPERS_DIR)/umap.json
+starmap: PORT=-p 8000:8000
+starmap: $(PAPERS_DIR)/starmap.json
 	$(RUN) bash -c 'cd starmap && npm i && npm run build'
+	(cd starmap/dist && python3 -m http.server)
 
-web_server: PORT=-p 8000:8000
-web_server:
-	(cd starmap/dist && $(RUN_IMAGE) python3 -m http.server)
+wordmap: DOCKER_ARGS=-p 8000:8000
+wordmap: WORK_DIR=/code/wordmap/newspapers
+wordmap: wordmap/newspapers/umap.csv
+	$(RUN) python3 -m http.server
+
+wordmap/newspapers/umap.csv: $(PAPERS_DIR)/umap.csv
+	cp $< $@
+
+wordmap/newspapers/umap.csv: $(PAPERS_DIR)/umap.csv
+	cp $< $@
 
 shiny: DOCKER_ARGS= -p 7727:7727
 shiny:

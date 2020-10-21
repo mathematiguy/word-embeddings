@@ -12,3 +12,4 @@ data/*
 starmap/dist
 starmap/.cache
 starmap/v8-compile-cache-0
+wordmap/newspapers/umap.csv
