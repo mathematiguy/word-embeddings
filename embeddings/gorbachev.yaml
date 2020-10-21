@@ -1,4 +1,4 @@
-docker: mathematiguy/papers-past:23c67e8
+docker: mathematiguy/papers-past:1ee460f
 requires:
   - papers-past-crawler
 triggers:
