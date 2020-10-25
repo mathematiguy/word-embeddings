@@ -6,9 +6,11 @@ export MIN_COUNT=30
 export AUTOTUNE_DURATION=600
 
 # Hyperparameters
-export MAX_N=6  # default: 6
+export MAX_N=6
 export N_NEIGHBOURS=5
 export MIN_DIST=0.8
+export RADIUS=1000
+export PRECISION=4
 
 cd ..
 
