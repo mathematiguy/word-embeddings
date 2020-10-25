@@ -90,10 +90,14 @@ starmap/starmap.json: embeddings/scripts/create_starmap.py $(PAPERS_DIR)/umap.cs
 
 starmap/dist/index.html: UID=root
 starmap/dist/index.html: GID=root
+starmap: IMAGE=node
 starmap/dist/index.html: starmap/starmap.json
 	$(RUN) bash -c 'cd starmap && npm i && npm run build'
 
+starmap: UID=root
+starmap: GID=root
 starmap: DOCKER_ARGS=-p 8000:8000
+starmap: IMAGE=node:15.0.1
 starmap: starmap/dist/index.html
 	$(RUN) bash -c 'cd starmap/dist && python3 -m http.server'
 
