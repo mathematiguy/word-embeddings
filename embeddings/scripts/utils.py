@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 from tqdm import tqdm
 from multiprocessing import cpu_count
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -59,3 +60,13 @@ def multicore_apply(array, func, n_jobs=cpu_count()-1, use_kwargs=False, front_n
         except Exception as e:
             out.append(e)
     return front + out
+
+
+def calculate_distance_matrix(A,B):
+    p1 = np.sum(A**2, axis=1)[:, np.newaxis]
+    p2 = np.sum(B**2, axis=1)
+    p3 = -2 * np.dot(A, B.T)
+    res = p1 + p2 + p3
+    res[res<0] = 0
+    res = np.sqrt(res)
+    return res
