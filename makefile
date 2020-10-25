@@ -76,17 +76,18 @@ $(PAPERS_DIR)/fasttext_cbow.bin: $(PAPERS_DIR)/corpus.train $(PAPERS_DIR)/corpus
 $(PAPERS_DIR)/word_counts.txt: $(PAPERS_DIR)/corpus.txt
 	$(RUN) cat $< | grep -oE '[a-zāēīōū_]+' | sort | uniq -c | sort -nr | awk '($$1 >= $(MIN_COUNT))' > $@
 
-N_NEIGHBOURS ?= 4
+N_NEIGHBOURS ?= 8
 MIN_DIST ?= 0.8
-METRIC ?= euclidean
 $(PAPERS_DIR)/umap.csv: embeddings/scripts/create_umap.py $(PAPERS_DIR)/fasttext_cbow.bin $(PAPERS_DIR)/word_counts.txt
 	$(RUN) python3 $< --word_vectors $(PAPERS_DIR)/fasttext_cbow.vec \
 		--word_counts $(PAPERS_DIR)/word_counts.txt --umap_file $@ \
-		--n_neighbours $(N_NEIGHBOURS) --min_dist $(MIN_DIST) --metric $(METRIC) \
+		--n_neighbours $(N_NEIGHBOURS) --min_dist $(MIN_DIST) \
 		--log_level $(LOG_LEVEL)
 
+RADIUS ?= 1000
+PRECISION ?= 4
 starmap/starmap.json: embeddings/scripts/create_starmap.py $(PAPERS_DIR)/umap.csv
-	$(RUN) python3 $< --umap_csv $(PAPERS_DIR)/umap.csv --umap_json $@ --log_level $(LOG_LEVEL)
+	$(RUN) python3 $< --umap_csv $(PAPERS_DIR)/umap.csv --umap_json $@ --radius $(RADIUS) --precision $(PRECISION) --log_level $(LOG_LEVEL)
 
 starmap/dist/index.html: UID=root
 starmap/dist/index.html: GID=root

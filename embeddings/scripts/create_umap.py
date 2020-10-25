@@ -4,7 +4,7 @@ import click
 import numpy as np
 import pandas as pd
 from scipy.linalg import norm
-from utils import initialise_logger, multicore_apply
+from utils import initialise_logger, multicore_apply, calculate_distance_matrix
 
 from umap import UMAP
 
@@ -37,9 +37,9 @@ def create_word_counts(word_counts):
 
 
 def calculate_umap(params, umap_data, similarity_matrix):
-    neighbors, dist, metric = params
+    neighbors, dist = params
 
-    reducer = UMAP(n_neighbors = neighbors, min_dist = dist, metric = metric, random_state = 42)
+    reducer = UMAP(n_neighbors = neighbors, min_dist = dist, random_state = 42)
     reduced = reducer.fit_transform(similarity_matrix)
 
     umap_data['n_neighbors'] = neighbors
@@ -57,7 +57,34 @@ def calculate_umap(params, umap_data, similarity_matrix):
 
     umap_data = umap_data[umap_data.word != '</s>']
 
+    umap_data['x'] = umap_data.x - umap_data.x.mean()
+    umap_data['y'] = umap_data.y - umap_data.y.mean()
+
     umap_data.columns = ['n_neighbors', 'min_dist', 'word', 'word_count', 'x_coord', 'y_coord', 'rank']
+
+    return umap_data
+
+
+def rescale_point_map(umap_data):
+
+    U = umap_data[['x_coord', 'y_coord']].values
+
+
+    norms = calculate_distance_matrix(U, np.array([[0,0]]))
+    U = U * np.log(norms)
+
+    # Scale point map so max_distance is 1
+    radius = np.max(calculate_distance_matrix(U, U)) / 2
+    U = U / radius
+
+    # Scale point map to set max_norm == 1
+    norms = calculate_distance_matrix(U, np.array([[0,0]]))
+    U = U / np.max(norms)
+
+    norms = calculate_distance_matrix(U, np.array([[0,0]]))
+
+    umap_data['x_coord'] = U[:,0]
+    umap_data['y_coord'] = U[:,1]
 
     return umap_data
 
@@ -68,9 +95,8 @@ def calculate_umap(params, umap_data, similarity_matrix):
 @click.option('--umap_file', help='Path to save umap.json')
 @click.option('--n_neighbours', type=int, help='This parameter controls how UMAP balances local versus global structure in the data.')
 @click.option('--min_dist', type=float, help='Controls how tightly UMAP is allowed to pack points together')
-@click.option('--metric', help='This controls how distance is computed in the ambient space of the input data')
 @click.option('--log_level', default='INFO', help='Log level (default: INFO)')
-def main(word_vectors, word_counts, umap_file, n_neighbours, min_dist, metric, log_level):
+def main(word_vectors, word_counts, umap_file, n_neighbours, min_dist, log_level):
 
     global logger
     logger = initialise_logger(log_level, __file__)
@@ -86,10 +112,12 @@ def main(word_vectors, word_counts, umap_file, n_neighbours, min_dist, metric, l
     similarity_matrix = np.dot(word_vectors, word_vectors.transpose())
 
     logger.info('Running umap model..')
-    n_neighbours = 4
-    min_dist = 0.8
-    umap_data = calculate_umap([n_neighbours, min_dist, metric], vector_data, similarity_matrix)
+    umap_data = calculate_umap([n_neighbours, min_dist], vector_data, similarity_matrix)
 
+    logger.info('Rescaling point map..')
+    umap_data = rescale_point_map(umap_data)
+
+    logger.info('Saving output to {}'.format(umap_file))
     umap_data.to_csv(umap_file, index = False)
 
     logger.info('Done!')
