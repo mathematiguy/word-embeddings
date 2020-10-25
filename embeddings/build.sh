@@ -2,10 +2,11 @@
 set -ex
 
 export RUN=
-export MIN_COUNT=30
 export AUTOTUNE_DURATION=600
 
 # Hyperparameters
+export MIN_COUNT=30
+export PHRASE_LENGTH=4
 export MAX_N=6
 export N_NEIGHBOURS=5
 export MIN_DIST=0.8

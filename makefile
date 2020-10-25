@@ -14,6 +14,7 @@ PAPERS_DIR ?= data/papers
 
 # Parameters
 MIN_COUNT ?= 30  # Minimum number of occurrences to keep a word in the corpus
+PHRASE_LENGTH ?= 4 
 
 .PHONY: starmap wordmap crawl shiny r_session jupyter ipython clean docker \
 	docker-push docker-pull enter enter-root
@@ -50,6 +51,7 @@ $(PAPERS_DIR)/sentences.csv: embeddings/scripts/create_sentences.py $(PAPERS_DIR
 		--paragraphs_csv $(PAPERS_DIR)/paragraphs.csv \
 		--sentences_csv $@ \
 		--min_count $(MIN_COUNT) \
+		--phrase_length $(PHRASE_LENGTH) \
 		--log_level $(LOG_LEVEL)
 
 $(PAPERS_DIR)/corpus.txt: embeddings/scripts/create_corpus.py $(PAPERS_DIR)/sentences.csv
