@@ -1,7 +1,7 @@
 FROM dragonflyscience/dragonverse-18.04
 
 USER root
-ENV NUMBA_CACHE_DIR /code
+ENV NUMBA_CACHE_DIR /cache
 
 RUN apt update
 
