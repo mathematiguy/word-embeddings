@@ -15,7 +15,8 @@ export PRECISION=4
 
 cd ..
 
-cp /input/papers-past-crawler/newspapers.json data/papers
+cp /input/papers-past-crawler/newspapers.json data/papers && \
+    touch data/papers/newspapers.json
 
 make all
 
