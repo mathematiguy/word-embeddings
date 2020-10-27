@@ -1,4 +1,4 @@
-docker: redis:4
+docker: mathematiguy/papers-past:c13766c
 requires:
   - papers-past-embeddings
 publish: papers-past
