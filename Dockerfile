@@ -1,7 +1,7 @@
 FROM dragonflyscience/dragonverse-18.04
 
 USER root
-ENV NUMBA_CACHE_DIR /cache
+ENV NUMBA_CACHE_DIR /tmp
 
 RUN apt update
 
@@ -12,7 +12,6 @@ RUN Rscript -e 'devtools::install_github("pommedeterresautee/fastrtext")'
 RUN Rscript -e 'install.packages("ggnetwork")'
 
 # Install python + other things
-RUN apt update
 RUN apt install -y python3-dev python3-pip node-gyp libssl1.0-dev npm tree nodejs-dev
 
 # Install fasttext
@@ -21,8 +20,7 @@ WORKDIR /code/submodules/fastText
 RUN make && cp fasttext /usr/bin
 
 # Install nodejs
-RUN apt-get update
-RUN apt-get -y install curl gnupg
+RUN apt-get -y install curl gnupg wget jq
 RUN curl -sL https://deb.nodesource.com/setup_15.x  | bash -
 RUN apt-get -y install nodejs
 RUN npm install

@@ -15,14 +15,12 @@ export PRECISION=4
 
 cd ..
 
-cp /input/papers-past-crawler/papers.json data/papers
+cp /input/papers-past-crawler/newspapers.json data/papers
 
 make all
 
-# Show file sizes for output
-du -sh data/papers/*
+zip /output/papers.zip data/papers/*
+cp starmap/papers.json /output
 
-mv data/papers/corpus.txt data/papers/corpus.train \
-   data/papers/corpus.test data/papers/word_counts.txt \
-   data/papers/fasttext_cbow.bin data/papers/fasttext_cbow.vec \
-   data/papers/*.csv starmap/starmap.json /output
+zip /output/te_ara.zip data/te_ara/*
+cp starmap/te_ara.json /output

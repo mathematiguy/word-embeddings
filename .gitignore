@@ -14,3 +14,10 @@ starmap/.cache
 starmap/v8-compile-cache-0
 wordmap/newspapers/umap.csv
 starmap/starmap.json
+credentials.json
+wget-log
+out.png
+starmap/papers.json
+starmap/te_ara.json
+wordmap/papers
+wordmap/te_ara

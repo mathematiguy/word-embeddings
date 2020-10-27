@@ -3,7 +3,7 @@ import json
 import click
 import numpy as np
 import pandas as pd
-from utils import initialise_logger, multicore_apply
+from utils import initialise_logger, multicore_apply, calculate_distance_matrix
 
 from umap import UMAP
 
@@ -33,6 +33,30 @@ def create_umap_json(umap_data, radius, precision):
     return umap_json
 
 
+def rescale_point_map(umap_data):
+
+    U = umap_data[['x_coord', 'y_coord']].values
+
+
+    norms = calculate_distance_matrix(U, np.array([[0,0]]))
+    U = U * np.log(norms)
+
+    # Scale point map so max_distance is 1
+    radius = np.max(calculate_distance_matrix(U, U)) / 2
+    U = U / radius
+
+    # Scale point map to set max_norm == 1
+    norms = calculate_distance_matrix(U, np.array([[0,0]]))
+    U = U / np.max(norms)
+
+    norms = calculate_distance_matrix(U, np.array([[0,0]]))
+
+    umap_data['x_coord'] = U[:,0]
+    umap_data['y_coord'] = U[:,1]
+
+    return umap_data
+
+
 @click.command()
 @click.option('--umap_csv', help='Path to umap.csv')
 @click.option('--umap_json', help='Path to save umap.json')
@@ -46,6 +70,9 @@ def main(umap_csv, umap_json, radius, precision, log_level):
 
     logger.info("Reading umap_data from {}".format(umap_csv))
     umap_data = pd.read_csv(umap_csv)
+
+    logger.info('Rescaling point map..')
+    umap_data = rescale_point_map(umap_data)
 
     logger.info("Saving output to {}".format(umap_json))
     starmap_json = create_umap_json(umap_data, radius, precision)

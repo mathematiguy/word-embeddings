@@ -175,7 +175,7 @@ const kupuInView = (camera: THREE.PerspectiveCamera, kupuData: Kupu[]) => {
 
 docReady(async () => {
   const { scene, camera, renderer, font, addRenderFunc, render} = await init()
-  const umap = await import("../starmap.json");
+  const umap = await import("../te_ara.json");
   const kupuData: Kupu[] = umap.data as Kupu[]
   const sprite = new THREE.TextureLoader().load(PointTexture);
   const pointMaterial = new THREE.PointsMaterial({ color: WHITE, map:sprite});

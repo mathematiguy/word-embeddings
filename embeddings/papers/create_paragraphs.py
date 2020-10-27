@@ -1,3 +1,6 @@
+import sys
+sys.path.append("embeddings")
+
 import click
 import pandas as pd
 from utils import initialise_logger

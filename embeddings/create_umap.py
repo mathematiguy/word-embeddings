@@ -4,7 +4,7 @@ import click
 import numpy as np
 import pandas as pd
 from scipy.linalg import norm
-from utils import initialise_logger, multicore_apply, calculate_distance_matrix
+from utils import initialise_logger, multicore_apply
 
 from umap import UMAP
 
@@ -65,30 +65,6 @@ def calculate_umap(params, umap_data, similarity_matrix):
     return umap_data
 
 
-def rescale_point_map(umap_data):
-
-    U = umap_data[['x_coord', 'y_coord']].values
-
-
-    norms = calculate_distance_matrix(U, np.array([[0,0]]))
-    U = U * np.log(norms)
-
-    # Scale point map so max_distance is 1
-    radius = np.max(calculate_distance_matrix(U, U)) / 2
-    U = U / radius
-
-    # Scale point map to set max_norm == 1
-    norms = calculate_distance_matrix(U, np.array([[0,0]]))
-    U = U / np.max(norms)
-
-    norms = calculate_distance_matrix(U, np.array([[0,0]]))
-
-    umap_data['x_coord'] = U[:,0]
-    umap_data['y_coord'] = U[:,1]
-
-    return umap_data
-
-
 @click.command()
 @click.option('--word_vectors', help='Path to fasttext.vec')
 @click.option('--word_counts', help='Path to word_counts.txt')
@@ -113,9 +89,6 @@ def main(word_vectors, word_counts, umap_file, n_neighbours, min_dist, log_level
 
     logger.info('Running umap model..')
     umap_data = calculate_umap([n_neighbours, min_dist], vector_data, similarity_matrix)
-
-    logger.info('Rescaling point map..')
-    umap_data = rescale_point_map(umap_data)
 
     logger.info('Saving output to {}'.format(umap_file))
     umap_data.to_csv(umap_file, index = False)
