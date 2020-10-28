@@ -161,7 +161,7 @@ diameter(G)
 
 farthest_vertices(G)
 
-shortest_paths(G, 'ko', 'raiwhara')
+shortest_paths(G, 'ko', 'kaiwhara')
 
 ```
 

@@ -1,3 +1,6 @@
+import sys
+sys.path.append("embeddings")
+
 import re
 import click
 import pandas as pd
@@ -30,26 +33,12 @@ def phrase_model(lines, min_count, threshold, phrase_length):
     return lines
 
 
-def create_sentences(sentences, min_count):
+def create_sentences(sentences, min_count, phrase_length):
 
     logger.info('Split paragraphs into sentences..')
     sentences['sentence'] = multicore_apply(sentences.paragraph, sent_tokenize, front_num=3)
     sentences = sentences[[col for col in sentences.columns if not col == 'paragraph']].explode('sentence')
     sentences = sentences[sentences.sentence.str.len() > 0].drop_duplicates()
-
-    group_vars = ['newspaper', 'issue', 'year', 'month', 'day', 'paragraph_id', 'sentence']
-    sentences['sentence_id'] = sentences.groupby(group_vars).ngroup()
-    sentences['sentence_id'] = sentences.sentence_id - \
-        (sentences
-             .groupby(['newspaper', 'issue', 'year', 'month', 'day', 'paragraph_id'],
-                      group_keys = False)
-             .transform(min)
-             ['sentence_id'])
-
-    sentences = (sentences
-        .sort_values(['newspaper', 'issue', 'year', 'month', 'day', 'paragraph_id', 'sentence_id'])
-        [['newspaper', 'issue', 'year', 'month', 'day', 'paragraph_id', 'sentence_id', 'sentence']]
-    )
 
     logger.info('Split sentences into words..')
     sentences['words'] = multicore_apply(sentences.sentence, extract_words, front_num=3)
@@ -75,7 +64,7 @@ def create_sentences(sentences, min_count):
             ))),
         min_count = min_count,
         threshold = 10,
-        phrase_length = 5
+        phrase_length = phrase_length // 2
     )
 
     logger.info('Extract non-māori phrases')
@@ -86,26 +75,27 @@ def create_sentences(sentences, min_count):
               )),
         min_count = min_count,
         threshold = 10,
-        phrase_length = 5
+        phrase_length = phrase_length // 2
     )
 
     sentences['words'] = sentences.words.apply(lambda x: ' '.join(x))
 
     return sentences
 
-
+4
 @click.command()
 @click.option('--paragraphs_csv', help='Path to paragraphs.csv')
 @click.option('--sentences_csv', help='Path to sentences.csv')
 @click.option('--min_count', type=int, help='Path to sentences.csv')
+@click.option('--phrase_length', type=int, help='Max phrase length')
 @click.option('--log_level', default='INFO', help='Log level (default: INFO)')
-def main(paragraphs_csv, sentences_csv, min_count, log_level):
+def main(paragraphs_csv, sentences_csv, min_count, phrase_length, log_level):
 
     global logger
     logger = initialise_logger(log_level, __file__)
 
     paragraphs = pd.read_csv(paragraphs_csv)
-    sentences = create_sentences(paragraphs, min_count)
+    sentences = create_sentences(paragraphs, min_count, phrase_length)
 
     logger.info('Save sentences to {}'.format(sentences_csv))
     sentences.to_csv(sentences_csv, index = False)

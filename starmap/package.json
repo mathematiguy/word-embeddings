@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "requestidlecallback-polyfill": "^1.0.2",
     "three": "^0.121.1"
   },
   "devDependencies": {
