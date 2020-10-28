@@ -3,6 +3,11 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { NAVY, WHITE } from "./colours";
 import PointTexture from "../assets/textures/point.png"
 
+interface UmapResponse {
+  data:Kupu[]
+}
+
+
 interface Kupu {
   word: string;
   position: [number, number, number];
@@ -27,6 +32,14 @@ const toTitleCase = (phrase: string) => {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 };
+
+async function get<ResponsePayload extends {}>(
+  request: RequestInfo
+): Promise<any> {
+  const response = await fetch(request);
+  const body = await response.json() as Promise<ResponsePayload>;
+  return body;
+}
 
 const buildFontMesh = (text: string, font: THREE.Font, material: THREE.LineBasicMaterial): Promise<THREE.Mesh<THREE.ShapeBufferGeometry, THREE.LineBasicMaterial>> => {
   return new Promise( (resolve) => {
@@ -173,9 +186,19 @@ const kupuInView = (camera: THREE.PerspectiveCamera, kupuData: Kupu[]) => {
   )
 }
 
+const dataURLFromParams = ():string => {
+  const urls = {
+    papers: "https://reports.dragonfly.co.nz/site/dragonfly-science/papers-past/papers.json",
+    te_ara: "https://reports.dragonfly.co.nz/site/dragonfly-science/papers-past/te_ara.json"
+  }
+  const params = new URLSearchParams(window.location.search);
+  return urls[params.get("data")]
+}
+
 docReady(async () => {
+  const dataUrl = dataURLFromParams()
+  const umap = await get<UmapResponse>(dataUrl);
   const { scene, camera, renderer, font, addRenderFunc, render} = await init()
-  const umap = await import("../te_ara.json");
   const kupuData: Kupu[] = umap.data as Kupu[]
   const sprite = new THREE.TextureLoader().load(PointTexture);
   const pointMaterial = new THREE.PointsMaterial({ color: WHITE, map:sprite});
