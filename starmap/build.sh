@@ -7,9 +7,6 @@ export RUN=
 cd ..
 
 # Send /input to data/papers directory
-cp /input/papers-past-crawler/newspapers.json data/papers/
-cp /input/papers-past-embeddings/papers.json starmap/
-
 unzip /input/papers-past-embeddings/papers.zip -d .
 unzip /input/papers-past-embeddings/te_ara.zip -d .
 
