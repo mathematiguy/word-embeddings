@@ -18,7 +18,7 @@ cd ..
 cp /input/papers-past-crawler/newspapers.json data/papers && \
     touch data/papers/newspapers.json
 
-make all
+make all API_TOKEN=${API_TOKEN}
 
 zip /output/papers.zip data/papers/*
 cp starmap/papers.json /output
