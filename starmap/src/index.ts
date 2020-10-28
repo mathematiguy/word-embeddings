@@ -7,7 +7,6 @@ interface UmapResponse {
   data:Kupu[]
 }
 
-
 interface Kupu {
   word: string;
   position: [number, number, number];
@@ -47,6 +46,38 @@ const buildFontMesh = (text: string, font: THREE.Font, material: THREE.LineBasic
     const geometry = new THREE.ShapeBufferGeometry(fontShapes, 1);
     const mesh = new THREE.Mesh(geometry, material)
     resolve(mesh)
+  })
+}
+
+type FontMesh = THREE.Mesh<THREE.ShapeBufferGeometry, THREE.LineBasicMaterial>
+
+const kupuLabelMap: Record<string, FontMesh> = {}
+
+const buildKupuLabels = async (scene: THREE.Scene, kupuData: Kupu[], font: THREE.Font) => {
+  const matDark = new THREE.LineBasicMaterial({
+    color: WHITE,
+    side: THREE.FrontSide
+  });
+  const camera = scene.getObjectByName("camera")
+  kupuData.forEach( async (kupu: Kupu) => {
+    if (kupuLabelMap[kupu.word]){
+      kupuLabelMap[kupu.word].visible = true;
+      return
+    }
+    const text = await buildFontMesh(toTitleCase(kupu.word.replace(/_/g, " ")), font, matDark);
+    text.position.set(kupu.position[0], kupu.position[1], kupu.position[2]);
+    text.lookAt(camera.position);
+    text.translateY(-.8)
+    text.translateX(2)
+    scene.add(text);
+    kupuLabelMap[kupu.word] = text
+  })
+}
+
+const hideAllKupuLabels = () => {
+  Object.keys(kupuLabelMap)
+  .forEach((key)=>{
+    kupuLabelMap[key].visible = false;
   })
 }
 
@@ -145,6 +176,9 @@ const initZoomListener = (camera: THREE.PerspectiveCamera, renderer: THREE.Rende
   })
 }
 
+  return camera
+}
+
 const initScene = (camera: THREE.PerspectiveCamera) => {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(NAVY);
@@ -185,7 +219,6 @@ const kupuInView = (camera: THREE.PerspectiveCamera, kupuData: Kupu[]) => {
     )
   )
 }
-
 const dataURLFromParams = ():string => {
   const urls = {
     papers: "https://reports.dragonfly.co.nz/site/dragonfly-science/papers-past/papers.json",
