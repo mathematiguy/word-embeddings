@@ -10,8 +10,8 @@ cd ..
 cp /input/papers-past-crawler/newspapers.json data/papers/
 cp /input/papers-past-embeddings/papers.json starmap/
 
-unzip /input/papers-past-embeddings/papers.zip -d data/papers/
-unzip /input/papers-past-embeddings/te_ara.zip -d data/papers/
+unzip /input/papers-past-embeddings/papers.zip -d .
+unzip /input/papers-past-embeddings/te_ara.zip -d .
 
 # Show everything in data/papers
 tree data
