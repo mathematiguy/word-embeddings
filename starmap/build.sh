@@ -10,9 +10,6 @@ cd ..
 unzip /input/papers-past-embeddings/papers.zip -d .
 unzip /input/papers-past-embeddings/te_ara.zip -d .
 
-# Show everything in data/papers
-tree data
-
 # Touch all dependencies for starmap
 make starmap/te_ara.json -tB
 
