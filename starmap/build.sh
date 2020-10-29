@@ -23,4 +23,4 @@ make starmap/dist/index.html
 cp -r starmap/papers.json starmap/te_ara.json starmap/dist/* /publish
 
 # Send dist/ folder to /output
-cp -r starmap/dist/* /output
+cp -r starmap/papers.json starmap/te_ara.json starmap/dist/* /output
