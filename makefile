@@ -105,17 +105,17 @@ starmap/%.json: embeddings/create_starmap.py data/%/umap.csv
 starmap/dist/index.html: UID=root
 starmap/dist/index.html: GID=root
 starmap/dist/index.html: starmap/te_ara.json
-	$(RUN) bash -c 'cd starmap && npm i && npm run build'
+	$(RUN) sh -c 'cd starmap && npm i && npm run build'
 
 starmap: UID=root
 starmap: GID=root
 starmap: DOCKER_ARGS=-p 8000:8000
 starmap: starmap/dist/index.html
-	$(RUN) bash -c 'cd starmap/dist && python3 -m http.server'
+	$(RUN) sh -c 'cd starmap/dist && python3 -m http.server'
 
 wordmap: DOCKER_ARGS=-p 8000:8000
 wordmap: wordmap/papers/umap.csv wordmap/te_ara/umap.csv
-	$(RUN) bash -c 'cd wordmap/ && python3 -m http.server'
+	$(RUN) sh -c 'cd wordmap/ && python3 -m http.server'
 
 wordmap/%/umap.csv: data/%/umap.csv
 	cp -r wordmap/D3 $(dir $@) && cp $< $@

@@ -1,4 +1,4 @@
-docker: mathematiguy/papers-past:c13766c
+docker: node:10.23-alpine
 requires:
   - papers-past-crawler
   - papers-past-embeddings
