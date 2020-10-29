@@ -104,7 +104,7 @@ starmap/%.json: embeddings/create_starmap.py data/%/umap.csv
 
 starmap/dist/index.html: UID=root
 starmap/dist/index.html: GID=root
-starmap/dist/index.html: starmap/te_ara.json
+starmap/dist/index.html: starmap/te_ara.json starmap/papers.json
 	$(RUN) sh -c 'cd starmap && npm i && npm run build'
 
 starmap: UID=root
