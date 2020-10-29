@@ -186,8 +186,8 @@ const kupuInView = (camera: THREE.PerspectiveCamera, kupuData: Kupu[]) => {
 }
 const dataURLFromParams = ():string => {
   const urls = {
-    papers: "https://reports.dragonfly.co.nz/site/dragonfly-science/papers-past/papers.json",
-    te_ara: "https://reports.dragonfly.co.nz/site/dragonfly-science/papers-past/te_ara.json"
+    papers: "https://reports.dragonfly.co.nz/site/dragonfly-science/papers-past/starmap/papers.json",
+    te_ara: "https://reports.dragonfly.co.nz/site/dragonfly-science/papers-past/starmap/te_ara.json"
   }
   const params = new URLSearchParams(window.location.search);
   return urls[params.get("data")]
