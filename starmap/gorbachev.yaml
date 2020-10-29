@@ -1,4 +1,4 @@
-docker: node:10.23-alpine
+docker: node:10.23
 requires:
   - papers-past-crawler
   - papers-past-embeddings
