@@ -11,8 +11,8 @@ unzip /input/papers-past-embeddings/papers.zip -d .
 unzip /input/papers-past-embeddings/te_ara.zip -d .
 
 # Touch all dependencies for starmap
-make starmap/te_ara.json -tB
-make starmap/papers.json -tB
+make data/te_ara/umap.csv -tB
+make data/papers/umap.csv -tB
 
 # Build the starmap front end
 make starmap/dist/index.html
