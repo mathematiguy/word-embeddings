@@ -18,3 +18,4 @@ make wordmap/papers/umap.csv
 make wordmap/te_ara/umap.csv
 
 cp -r wordmap/papers wordmap/te_ara /publish
+tree /publish
