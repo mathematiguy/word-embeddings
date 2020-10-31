@@ -108,7 +108,7 @@ wordmap: wordmap/papers/umap.csv wordmap/te_ara/umap.csv
 	$(RUN) sh -c 'cd wordmap/ && python3 -m http.server'
 
 wordmap/%/umap.csv: data/%/umap.csv
-	cp -r wordmap/D3 $(dir $@) && cp $< $@
+	cp -r wordmap/D3/* $(dir $@) && cp $< $@
 
 shiny: DOCKER_ARGS= -p 7727:7727
 shiny:
