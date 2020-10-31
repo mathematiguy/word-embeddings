@@ -14,4 +14,4 @@ tree data
 make wordmap/papers/umap.csv -tB
 make wordmap/te_ara/umap.csv -tB
 
-cp -r papers te_ara /publish
+cp -r wordmap/papers wordmap/te_ara /publish
