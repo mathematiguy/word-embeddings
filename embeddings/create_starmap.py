@@ -14,7 +14,15 @@ def get_z_coordinate(x, y):
     if norm > 1:
         x = x / norm
         y = y / norm
-    return np.sqrt(1 - x ** 2 - y ** 2)
+
+    result = 1 - x**2 - y**2
+    if result < 0 and np.abs(result) < 1:
+        return 1
+    elif result >= 0:
+        return np.sqrt(result)
+    else:
+        assert False, "result={}, x={}, y={}, 1-x^2-y^2={}, sqrt(1-x^2-y^2)"\
+            .format(result, x, y, 1-x**2-y**2, np.sqrt(1-x**2-y**2))
 
 
 def create_umap_json(umap_data, radius, precision):
