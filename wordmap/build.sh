@@ -2,6 +2,8 @@
 
 set -ex
 
+export RUN=
+
 cd ..
 
 unzip /input/papers-past-embeddings/papers.zip -d .
