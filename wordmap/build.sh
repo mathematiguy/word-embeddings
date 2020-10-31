@@ -2,8 +2,10 @@
 
 set -ex
 
-unzip /input/papers-past-embeddings/papers.zip -d data/papers
-unzip /input/papers-past-embeddings/te_ara.zip -d data/te_ara
+cd ..
+
+unzip /input/papers-past-embeddings/papers.zip -d .
+unzip /input/papers-past-embeddings/te_ara.zip -d .
 
 tree data
 
