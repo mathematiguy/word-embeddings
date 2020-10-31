@@ -70,21 +70,11 @@ data/%/corpus.txt: embeddings/create_corpus.py data/%/sentences.csv
 		--corpus_file data/$*/corpus.txt \
 		--log_level $(LOG_LEVEL)
 
-data/%/corpus.shuf: data/%/corpus.txt
-	cat $< | shuf > $@
-
-data/%/corpus.train: data/%/corpus.shuf
-	head $< -n $(shell expr `wc -l $< | awk '{print $$1}'` \* 8 / 10) > $@
-
-data/%/corpus.test: data/%/corpus.shuf
-	tail $< -n +$(shell expr `wc -l $< | awk '{print $$1}'` \* 8 / 10 + 1) > $@
-
 MAX_N ?= 6
 AUTOTUNE_DURATION ?= 30
-data/%/fasttext_cbow.bin: data/%/corpus.train data/%/corpus.test
+data/%/fasttext_cbow.bin: data/%/corpus.txt
 	$(RUN) fasttext cbow -input $< -output $(basename $@) -minCount $(MIN_COUNT) \
-		-thread $(NUM_CORES) -autotune-duration $(AUTOTUNE_DURATION) -maxn $(MAX_N) \
-		-autotune-validation data/$*/corpus.test
+		-thread $(NUM_CORES) -maxn $(MAX_N)
 
 data/%/word_counts.txt: data/%/corpus.txt
 	$(RUN) cat $< | grep -oE '[a-zāēīōū_]+' | sort | uniq -c | sort -nr | awk '($$1 >= $(MIN_COUNT))' > $@
