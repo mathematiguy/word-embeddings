@@ -1,5 +1,9 @@
-docker: mathematiguy/papers-past:1ee460f
+docker: mathematiguy/papers-past:c13766c
 requires:
   - papers-past-crawler
+triggers:
+  - papers-past-analysis
+  - papers-past-starmap
+  - papers-past-wordmap
 cpus: 8
 memory: 16
